@@ -10,7 +10,7 @@ import fuookami.ospf.kotlin.core.frontend.expression.symbol.*
 import fuookami.ospf.kotlin.core.frontend.inequality.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 
-class IfThen(
+class IfThenFunction(
     p: LinearInequality,
     q: LinearInequality,
     private val constraint: Boolean = true,
