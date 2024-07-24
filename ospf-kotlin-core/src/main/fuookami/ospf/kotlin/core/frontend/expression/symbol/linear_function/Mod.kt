@@ -63,7 +63,7 @@ class ModFunction(
     override suspend fun prepare(tokenTable: AbstractTokenTable) {
         x.cells
 
-        if (tokenTable.cachedSolution) {
+        if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             x.value(tokenTable)?.let { xValue ->
                 val qValue = (xValue / d).let {
                     if (it geq Flt64.zero) {

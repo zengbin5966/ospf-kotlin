@@ -29,11 +29,7 @@ class IntDivFunction(
 
     private val r: URealVar by lazy {
         val r = URealVar("${name}_r")
-        r.range.leq(if (d geq Flt64.zero) {
-            d.floor()
-        } else {
-            d.ceil().abs()
-        })
+        r.range.leq(possibleModUpperBound)
         r
     }
 
@@ -58,24 +54,29 @@ class IntDivFunction(
     override val cached get() = y.cached
 
     private val possibleRange get() = ValueRange(
-        (x.upperBound / d).floor(),
-        (x.lowerBound / d).floor()
+        (x.lowerBound / d).floor(),
+        (x.upperBound / d).floor()
     )
+
+    private val possibleModUpperBound
+        get() = if (d geq Flt64.zero) {
+            d.floor()
+        } else {
+            d.ceil().abs()
+        }
 
     override fun flush(force: Boolean) {
         x.flush(force)
         y.flush(force)
-        q.range.set(ValueRange(
-            possibleRange.lowerBound.unwrap().toInt64(),
-            possibleRange.upperBound.unwrap().toInt64()
-        ))
+        q.range.set(ValueRange(possibleRange.lowerBound.unwrap().toInt64(), possibleRange.upperBound.unwrap().toInt64()))
+        r.range.set(ValueRange(Flt64.zero, possibleModUpperBound))
         y.range.set(possibleRange)
     }
 
     override suspend fun prepare(tokenTable: AbstractTokenTable) {
         x.cells
 
-        if (tokenTable.cachedSolution) {
+        if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             x.value(tokenTable)?.let { xValue ->
                 val qValue = (xValue / d).let {
                     if (it geq Flt64.zero) {

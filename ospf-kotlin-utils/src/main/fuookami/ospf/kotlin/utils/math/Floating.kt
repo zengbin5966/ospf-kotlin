@@ -308,7 +308,7 @@ data object FltXJsonSerializer : KSerializer<FltX> {
         )
 
         val element = decoder.decodeSerializableValue(JsonPrimitive::class.serializer())
-        return FltX(element.content)
+        return FltX(element.content, FltX.decimalDigits)
     }
 
     override fun serialize(encoder: Encoder, value: FltX) {
@@ -335,8 +335,7 @@ value class FltX(internal val value: BigDecimal) : FloatingImpl<FltX>, Copyable<
         override val e: FltX get() = FltX(E.toBigDecimal())
     }
 
-    constructor(value: Double) : this(BigDecimal.valueOf(value))
-    constructor(value: Double, scale: Int, roundingMode: RoundingMode = RoundingMode.HALF_UP) : this(BigDecimal.valueOf(value).setScale(scale, roundingMode))
+    constructor(value: Double, scale: Int = decimalDigits, roundingMode: RoundingMode = RoundingMode.HALF_UP) : this(BigDecimal.valueOf(value).setScale(scale, roundingMode))
     constructor(value: Long, scale: Int = 2) : this(BigDecimal.valueOf(value).setScale(scale))
     constructor(value: String, scale: Int = 2) : this(BigDecimal(value).setScale(scale))
 

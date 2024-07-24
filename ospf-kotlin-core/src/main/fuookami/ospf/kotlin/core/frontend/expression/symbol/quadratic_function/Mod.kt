@@ -80,7 +80,7 @@ class ModFunction(
         x.cells
         d.cells
 
-        if (tokenTable.cachedSolution) {
+        if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             x.value(tokenTable)?.let { xValue ->
                 d.value(tokenTable)?.let { dValue ->
                     val qValue = (xValue / dValue).let {
