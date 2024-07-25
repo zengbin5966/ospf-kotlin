@@ -132,15 +132,7 @@ class BalanceTernaryzationFunctionImpl(
                     Flt64.zero
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -193,15 +185,7 @@ class BalanceTernaryzationFunctionPiecewiseImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             piecewiseFunction.value(tokenTable)?.let { yValue ->
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -284,15 +268,7 @@ class BalanceTernaryzationFunctionDiscreteImpl(
                 } else {
                     Flt64.zero
                 }
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -445,15 +421,7 @@ class BalanceTernaryzationFunctionExtractAndNotDiscreteImpl(
                     }
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }

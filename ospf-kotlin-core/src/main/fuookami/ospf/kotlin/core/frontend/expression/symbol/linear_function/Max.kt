@@ -107,15 +107,7 @@ sealed class AbstractMaxFunction(
                     }
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = max.value!!
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = max.value!!
-                    }
-                }
+                tokenTable.cache(this, null, max.value!!)
             }
         }
     }

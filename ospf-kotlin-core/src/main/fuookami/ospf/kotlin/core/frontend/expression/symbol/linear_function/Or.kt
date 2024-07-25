@@ -84,15 +84,7 @@ class OrFunction(
                     tokenTable.find(y)?.let { token ->
                         token._result = Flt64.one
                     }
-                    when (tokenTable) {
-                        is TokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = Flt64.one
-                        }
-
-                        is MutableTokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = Flt64.one
-                        }
-                    }
+                    tokenTable.cache(this, null, Flt64.one)
                     return
                 }
             }

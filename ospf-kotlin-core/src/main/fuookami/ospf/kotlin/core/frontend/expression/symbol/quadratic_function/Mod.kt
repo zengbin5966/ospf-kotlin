@@ -100,15 +100,7 @@ class ModFunction(
                         token._result = rValue
                     }
 
-                    when (tokenTable) {
-                        is TokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = rValue
-                        }
-
-                        is MutableTokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = rValue
-                        }
-                    }
+                    tokenTable.cache(this, null, rValue)
                 }
             }
         }

@@ -135,15 +135,7 @@ private class AndFunctionOnePolynomialImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             bin.value(tokenTable)?.let { binValue ->
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = binValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = binValue
-                    }
-                }
+                tokenTable.cache(parent, null, binValue)
             }
         }
     }
@@ -208,15 +200,7 @@ private class AndFunctionMultiPolynomialImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             bin.value(tokenTable)?.let { binValue ->
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = binValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = binValue
-                    }
-                }
+                tokenTable.cache(parent, null, binValue)
             }
         }
     }
@@ -297,23 +281,11 @@ private class AndFunctionMultiPolynomialBinaryImpl(
                 }
             }
 
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = if (yValue) {
-                        Flt64.one
-                    } else {
-                        Flt64.zero
-                    }
-                }
-
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = if (yValue) {
-                        Flt64.one
-                    } else {
-                        Flt64.zero
-                    }
-                }
-            }
+            tokenTable.cache(parent, null, if (yValue) {
+                Flt64.one
+            } else {
+                Flt64.zero
+            })
         }
     }
 

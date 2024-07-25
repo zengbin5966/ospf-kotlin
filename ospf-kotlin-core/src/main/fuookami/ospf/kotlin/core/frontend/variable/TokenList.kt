@@ -1,14 +1,11 @@
 package fuookami.ospf.kotlin.core.frontend.variable
 
-import fuookami.ospf.kotlin.core.frontend.model.mechanism.AutoAddTokenTable
-import fuookami.ospf.kotlin.core.frontend.model.mechanism.MutableTokenTable
-import java.util.*
+import kotlin.collections.*
+import io.michaelrocks.bimap.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.functional.*
-import io.michaelrocks.bimap.*
-import kotlin.collections.HashMap
 
 private fun tokenIndexMap(tokens: Collection<Token>): BiMap<Token, Int> {
     val ret = HashBiMap<Token, Int>()
@@ -21,6 +18,7 @@ private fun tokenIndexMap(tokens: Collection<Token>): BiMap<Token, Int> {
 sealed interface AbstractTokenList {
     val tokens: Collection<Token>
     val tokenIndexMap: BiMap<Token, Int>
+    val cachedSolution: Boolean get() = tokens.all { it.result != null }
 
     operator fun get(index: Int): Token {
         return tokenIndexMap.inverse[index] ?: tokens.find { it.solverIndex == index }!!
@@ -80,6 +78,8 @@ sealed class MutableTokenList(
 ) : AbstractTokenList, Copyable<MutableTokenList> {
     override val tokens by list::values
 
+    private val lock = Any()
+
     private lateinit var _tokenIndexMap: BiMap<Token, Int>
     override val tokenIndexMap: BiMap<Token, Int>
         get() {
@@ -88,20 +88,14 @@ sealed class MutableTokenList(
             }
             return _tokenIndexMap
         }
-
-    fun add(item: AbstractVariableItem<*, *>): Try {
-        _tokenIndexMap = HashBiMap()
-        if (list.containsKey(item.key)) {
-            return Failed(Err(ErrorCode.TokenExisted))
+    override val cachedSolution: Boolean get() {
+        return synchronized(lock) {
+            tokens.all { it.result != null }
         }
-        list[item.key] = Token(item, currentIndex)
-        ++currentIndex
-        return ok
     }
 
-    fun add(items: Iterable<AbstractVariableItem<*, *>>): Try {
-        _tokenIndexMap = HashBiMap()
-        for (item in items) {
+    fun add(item: AbstractVariableItem<*, *>): Try {
+        synchronized(lock) {
             if (list.containsKey(item.key)) {
                 return Failed(Err(ErrorCode.TokenExisted))
             }
@@ -111,9 +105,24 @@ sealed class MutableTokenList(
         return ok
     }
 
+    fun add(items: Iterable<AbstractVariableItem<*, *>>): Try {
+        synchronized(lock) {
+            for (item in items) {
+                if (list.containsKey(item.key)) {
+                    return Failed(Err(ErrorCode.TokenExisted))
+                }
+                list[item.key] = Token(item, currentIndex)
+                ++currentIndex
+            }
+        }
+        return ok
+    }
+
     fun remove(item: AbstractVariableItem<*, *>) {
-        _tokenIndexMap = HashBiMap()
-        list.remove(item.key)
+        synchronized(lock) {
+            _tokenIndexMap = HashBiMap()
+            list.remove(item.key)
+        }
     }
 }
 

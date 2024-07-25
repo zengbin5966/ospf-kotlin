@@ -26,7 +26,7 @@ sealed interface AbstractTokenTable {
     val tokens: Collection<Token> get() = tokenList.tokens
     val tokenIndexMap: BiMap<Token, Int> get() = tokenList.tokenIndexMap
     val symbols: Collection<Symbol>
-    val cachedSolution: Boolean get() = tokenList.tokens.any { it._result != null }
+    val cachedSolution: Boolean get() = tokenList.cachedSolution
 
     fun find(item: AbstractVariableItem<*, *>): Token? {
         return tokenList.find(item)
@@ -68,6 +68,18 @@ sealed interface AbstractTokenTable {
     fun cached(symbol: Symbol, solution: List<Flt64>? = null): Boolean? {
         return null
     }
+
+    fun cachedValue(symbol: Symbol, solution: List<Flt64>? = null): Flt64? {
+        return null
+    }
+
+    fun cache(symbol: Symbol, solution: List<Flt64>? = null, value: Flt64): Flt64 {
+        return value
+    }
+
+    fun cache(symbol: Symbol, solution: List<Flt64>? = null, value: () -> Flt64): Flt64 {
+        return cache(symbol, solution, value())
+    }
 }
 
 data class TokenTable(
@@ -83,10 +95,32 @@ data class TokenTable(
 
     override val tokens by tokenList::tokens
 
-    internal val cachedSymbolValue: MutableMap<Pair<Symbol, List<Flt64>?>, Flt64?> = ConcurrentHashMap()
+    private val lock = Any()
+    private val cachedSymbolValue: MutableMap<Pair<Symbol, List<Flt64>?>, Flt64?> = HashMap()
 
     override fun flush() {
-        cachedSymbolValue.clear()
+        synchronized(lock) {
+            cachedSymbolValue.clear()
+        }
+    }
+
+    override fun cached(symbol: Symbol, solution: List<Flt64>?): Boolean {
+        return synchronized(lock) {
+            cachedSymbolValue.containsKey(symbol to solution)
+        }
+    }
+
+    override fun cachedValue(symbol: Symbol, solution: List<Flt64>?): Flt64? {
+        return synchronized(lock) {
+            cachedSymbolValue[symbol to solution]
+        }
+    }
+
+    override fun cache(symbol: Symbol, solution: List<Flt64>?, value: Flt64): Flt64 {
+        synchronized(lock) {
+            cachedSymbolValue[symbol to solution] = value
+        }
+        return value
     }
 }
 
@@ -98,7 +132,8 @@ sealed class MutableTokenTable(
     private val _symbolsMap: MutableMap<String, Symbol> = _symbols.associateBy { it.name }.toMutableMap()
     override val symbols by ::_symbols
 
-    internal val cachedSymbolValue: MutableMap<Pair<Symbol, List<Flt64>?>, Flt64?> = ConcurrentHashMap()
+    private val lock = Any()
+    private val cachedSymbolValue: MutableMap<Pair<Symbol, List<Flt64>?>, Flt64?> = HashMap()
 
     fun add(item: AbstractVariableItem<*, *>): Try {
         return tokenList.add(item)
@@ -152,11 +187,28 @@ sealed class MutableTokenTable(
     }
 
     override fun flush() {
-        cachedSymbolValue.clear()
+        synchronized(lock) {
+            cachedSymbolValue.clear()
+        }
     }
 
     override fun cached(symbol: Symbol, solution: List<Flt64>?): Boolean {
-         return !cachedSymbolValue.containsKey(symbol to solution)
+         return synchronized(lock) {
+             cachedSymbolValue.containsKey(symbol to solution)
+         }
+    }
+
+    override fun cachedValue(symbol: Symbol, solution: List<Flt64>?): Flt64? {
+        return synchronized(lock) {
+            cachedSymbolValue[symbol to solution]
+        }
+    }
+
+    override fun cache(symbol: Symbol, solution: List<Flt64>?, value: Flt64): Flt64 {
+        synchronized(lock) {
+            cachedSymbolValue[symbol to solution] = value
+        }
+        return value
     }
 }
 

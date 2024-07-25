@@ -168,15 +168,7 @@ sealed class AbstractSlackFunction<V : Variable<*>>(
             }
 
             val slackValue = negValue + posValue
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[this to null] = slackValue
-                }
-
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[this to null] = slackValue
-                }
-            }
+            tokenTable.cache(this, null, slackValue)
         }
     }
 

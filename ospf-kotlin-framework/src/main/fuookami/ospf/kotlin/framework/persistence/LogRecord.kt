@@ -43,10 +43,10 @@ open class LogRecordByteRDAO(tableName: String) : Table<LogRecordByteRPO>(tableN
     val version = varchar("version").bindTo { it.version }
     val serviceId = varchar("service_id").bindTo { it.serviceId }
     val step = varchar("step").bindTo { it.step }
-    val type = enum<LogRecordType>("type").bindTo { it.type }
-    val time = kotlinDatetime("time").bindTo { it.time }
+    val type = enum<LogRecordType>("log_type").bindTo { it.type }
+    val time = kotlinDatetime("log_time").bindTo { it.time }
     val availableTime = kotlinDatetime("available_time").bindTo { it.availableTime }
-    val value = blob("value").bindTo { it.value }
+    val value = blob("log_content").bindTo { it.value }
 }
 
 open class LogRecordStringRDAO(tableName: String) : Table<LogRecordStringRPO>(tableName) {
@@ -55,10 +55,10 @@ open class LogRecordStringRDAO(tableName: String) : Table<LogRecordStringRPO>(ta
     val version = varchar("version").bindTo { it.version }
     val serviceId = varchar("service_id").bindTo { it.serviceId }
     val step = varchar("step").bindTo { it.step }
-    val type = enum<LogRecordType>("type").bindTo { it.type }
-    val time = kotlinDatetime("time").bindTo { it.time }
+    val type = enum<LogRecordType>("log_type").bindTo { it.type }
+    val time = kotlinDatetime("log_time").bindTo { it.time }
     val availableTime = kotlinDatetime("available_time").bindTo { it.availableTime }
-    val value = varchar("value").bindTo { it.value }
+    val value = varchar("log_content").bindTo { it.value }
 }
 
 @OptIn(InternalSerializationApi::class)

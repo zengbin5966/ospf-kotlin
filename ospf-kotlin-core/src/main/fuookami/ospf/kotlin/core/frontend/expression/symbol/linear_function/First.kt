@@ -113,16 +113,8 @@ class FirstFunction(
                     }
                 }
             }
-            
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[this to null] = Flt64(first ?: polynomials.size)
-                }
-                
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[this to null] = Flt64(first ?: polynomials.size)
-                }
-            }
+
+            tokenTable.cache(this, null, Flt64(first ?: polynomials.size))
         }
     }
 

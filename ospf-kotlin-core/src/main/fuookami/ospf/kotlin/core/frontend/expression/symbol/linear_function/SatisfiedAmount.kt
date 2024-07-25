@@ -191,15 +191,7 @@ private class SatisfiedAmountPolynomialFunctionAnyImpl(
                 Flt64.zero
             }
 
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-            }
+            tokenTable.cache(parent, null, yValue)
         }
     }
 
@@ -261,15 +253,7 @@ private class SatisfiedAmountPolynomialFunctionAllImpl(
                 Flt64.zero
             }
 
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-            }
+            tokenTable.cache(parent, null, yValue)
         }
     }
 
@@ -363,15 +347,7 @@ private class SatisfiedAmountPolynomialFunctionSomeImpl(
                 Flt64(count)
             }
 
-            when (tokenTable) {
-                is TokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-
-                is MutableTokenTable -> {
-                    tokenTable.cachedSymbolValue[parent to null] = yValue
-                }
-            }
+            tokenTable.cache(parent, null, yValue)
         }
     }
 

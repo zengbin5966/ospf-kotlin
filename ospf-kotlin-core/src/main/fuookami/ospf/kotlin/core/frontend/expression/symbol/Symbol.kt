@@ -68,46 +68,30 @@ abstract class ExpressionSymbol(
     }
 
     override fun value(tokenTable: AbstractTokenTable, zeroIfNone: Boolean): Flt64? {
-        return when (tokenTable) {
-            is TokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to null)) {
-                        dependency.value(tokenTable, zeroIfNone)
-                    }
+        return if (tokenTable.cachedSolution && tokenTable.cached(this, null) == false) {
+            for (dependency in dependencies) {
+                if (tokenTable.cachedSolution && tokenTable.cached(dependency, null) == false) {
+                    dependency.value(tokenTable, zeroIfNone)
                 }
-                tokenTable.cachedSymbolValue.getOrPut(this to null) { polynomial.value(tokenTable, zeroIfNone) ?: return null }
             }
-
-            is MutableTokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to null)) {
-                        dependency.value(tokenTable, zeroIfNone)
-                    }
-                }
-                tokenTable.cachedSymbolValue.getOrPut(this to null) { polynomial.value(tokenTable, zeroIfNone) ?: return null }
-            }
+            val value = polynomial.value(tokenTable, zeroIfNone) ?: return null
+            tokenTable.cache(this, null, value)
+        } else {
+            tokenTable.cachedValue(this, null)
         }
     }
 
     override fun value(results: List<Flt64>, tokenTable: AbstractTokenTable, zeroIfNone: Boolean): Flt64? {
-        return when (tokenTable) {
-            is TokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to results)) {
-                        dependency.value(results, tokenTable, zeroIfNone)
-                    }
+        return if (tokenTable.cached(this, results) == false) {
+            for (dependency in dependencies) {
+                if (tokenTable.cached(dependency, results) == false) {
+                    dependency.value(tokenTable, zeroIfNone)
                 }
-                tokenTable.cachedSymbolValue.getOrPut(this to results) { polynomial.value(results, tokenTable, zeroIfNone) ?: return null }
             }
-
-            is MutableTokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to results)) {
-                        dependency.value(results, tokenTable, zeroIfNone)
-                    }
-                }
-                tokenTable.cachedSymbolValue.getOrPut(this to results) { polynomial.value(results, tokenTable, zeroIfNone) ?: return null }
-            }
+            val value = polynomial.value(results, tokenTable, zeroIfNone) ?: return null
+            tokenTable.cache(this, results, value)
+        } else {
+            tokenTable.cachedValue(this, results)
         }
     }
 
@@ -375,46 +359,30 @@ interface FunctionSymbol : Symbol {
     fun register(tokenTable: MutableTokenTable): Try
 
     override fun value(tokenTable: AbstractTokenTable, zeroIfNone: Boolean): Flt64? {
-        return when (tokenTable) {
-            is TokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to null)) {
-                        dependency.value(tokenTable, zeroIfNone)
-                    }
+        return if (tokenTable.cachedSolution && tokenTable.cached(this, null) == false) {
+            for (dependency in dependencies) {
+                if (tokenTable.cached(dependency, null) == false) {
+                    dependency.value(tokenTable, zeroIfNone)
                 }
-                tokenTable.cachedSymbolValue.getOrPut(this to null) { calculateValue(tokenTable, zeroIfNone) ?: return null }
             }
-
-            is MutableTokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to null)) {
-                        dependency.value(tokenTable, zeroIfNone)
-                    }
-                }
-                tokenTable.cachedSymbolValue.getOrPut(this to null) { calculateValue(tokenTable, zeroIfNone) ?: return null }
-            }
+            val value = calculateValue(tokenTable, zeroIfNone) ?: return null
+            tokenTable.cache(this, null, value)
+        } else {
+            tokenTable.cachedValue(this, null)
         }
     }
 
     override fun value(results: List<Flt64>, tokenTable: AbstractTokenTable, zeroIfNone: Boolean): Flt64? {
-        return when (tokenTable) {
-            is TokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to results)) {
-                        dependency.value(results, tokenTable, zeroIfNone)
-                    }
+        return if (tokenTable.cached(this, results) == false) {
+            for (dependency in dependencies) {
+                if (tokenTable.cached(dependency, results) == false) {
+                    dependency.value(tokenTable, zeroIfNone)
                 }
-                tokenTable.cachedSymbolValue.getOrPut(this to results) { calculateValue(results, tokenTable, zeroIfNone) ?: return null }
             }
-
-            is MutableTokenTable -> {
-                for (dependency in dependencies) {
-                    if (!tokenTable.cachedSymbolValue.containsKey(dependency to results)) {
-                        dependency.value(results, tokenTable, zeroIfNone)
-                    }
-                }
-                tokenTable.cachedSymbolValue.getOrPut(this to results) { calculateValue(results, tokenTable, zeroIfNone) ?: return null }
-            }
+            val value = calculateValue(results, tokenTable, zeroIfNone) ?: return null
+            tokenTable.cache(this, results, value)
+        } else {
+            tokenTable.cachedValue(this, results)
         }
     }
 

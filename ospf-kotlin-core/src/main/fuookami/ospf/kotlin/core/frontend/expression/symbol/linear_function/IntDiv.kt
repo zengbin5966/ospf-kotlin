@@ -91,15 +91,7 @@ class IntDivFunction(
                 logger.trace { "Setting ModFunction ${name}.r initial solution: $rValue" }
                 tokenTable.find(r)?.let { token -> token._result = rValue }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = qValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = qValue
-                    }
-                }
+                tokenTable.cache(this, null, qValue)
             }
         }
     }

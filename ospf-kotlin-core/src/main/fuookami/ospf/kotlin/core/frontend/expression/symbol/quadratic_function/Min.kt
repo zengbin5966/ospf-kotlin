@@ -109,15 +109,7 @@ sealed class AbstractMinFunction(
                     }
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = min.value!!
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = min.value!!
-                    }
-                }
+                tokenTable.cache(this, null, min.value!!)
             }
         }
     }

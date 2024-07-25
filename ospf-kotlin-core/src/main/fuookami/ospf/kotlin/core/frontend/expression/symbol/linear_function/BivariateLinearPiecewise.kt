@@ -166,15 +166,7 @@ sealed class AbstractBivariateLinearPiecewiseFunction(
                 }
             }
             if (zValue != null) {
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = zValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = zValue
-                    }
-                }
+                tokenTable.cache(this, null, zValue)
             }
         }
     }

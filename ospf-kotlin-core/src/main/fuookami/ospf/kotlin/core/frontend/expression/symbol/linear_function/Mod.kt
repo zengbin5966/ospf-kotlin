@@ -78,15 +78,7 @@ class ModFunction(
                 logger.trace { "Setting ModFunction ${name}.r initial solution: $rValue" }
                 tokenTable.find(r)?.let { token -> token._result = rValue }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = rValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = rValue
-                    }
-                }
+                tokenTable.cache(this, null, rValue)
             }
         }
     }

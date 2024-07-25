@@ -121,15 +121,7 @@ class IntDivFunction(
                         token._result = rValue
                     }
 
-                    when (tokenTable) {
-                        is TokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = qValue
-                        }
-
-                        is MutableTokenTable -> {
-                            tokenTable.cachedSymbolValue[this to null] = qValue
-                        }
-                    }
+                    tokenTable.cache(this, null, qValue)
                 }
             }
         }

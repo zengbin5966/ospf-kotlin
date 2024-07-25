@@ -115,15 +115,7 @@ class BinaryzationFunctionImpl(
                     Flt64.zero
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -174,15 +166,7 @@ class BinaryzationFunctionPiecewiseImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             piecewiseFunction.value(tokenTable)?.let { yValue ->
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -250,15 +234,7 @@ class BinaryzationFunctionDiscreteImpl(
                     token._result = yValue
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }
@@ -351,15 +327,7 @@ class BinaryzationFunctionExtractAndNotDiscreteImpl(
                     token._result = yValue
                 }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[parent to null] = yValue
-                    }
-                }
+                tokenTable.cache(parent, null, yValue)
             }
         }
     }

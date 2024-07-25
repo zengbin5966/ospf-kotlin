@@ -83,15 +83,7 @@ class AbsFunction(
                 logger.trace { "Setting AbsFunction ${name}.p initial solution: $pValue" }
                 tokenTable.find(p)?.let { token -> token._result = if (pValue) { Flt64.one } else { Flt64.zero } }
 
-                when (tokenTable) {
-                    is TokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = yValue
-                    }
-
-                    is MutableTokenTable -> {
-                        tokenTable.cachedSymbolValue[this to null] = yValue
-                    }
-                }
+                tokenTable.cache(this, null, yValue)
             }
         }
     }
