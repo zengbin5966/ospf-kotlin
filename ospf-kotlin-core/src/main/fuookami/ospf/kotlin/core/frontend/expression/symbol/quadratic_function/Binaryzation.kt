@@ -169,7 +169,7 @@ class BinaryzationFunctionLinearImpl(
                     Flt64.zero
                 }
 
-                logger.trace { "Setting BinaryzationFunction ${name}.y initial solution: value" }
+                logger.trace { "Setting BinaryzationFunction ${name}.y initial solution: $yValue" }
                 tokenTable.find(y)?.let { token ->
                     token._result = yValue
                 }
@@ -180,6 +180,22 @@ class BinaryzationFunctionLinearImpl(
     }
 
     override fun register(tokenTable: MutableTokenTable): Try {
+        when (val result = tokenTable.add(y)) {
+            is Ok -> {}
+
+            is Failed -> {
+                return Failed(result.error)
+            }
+        }
+
+        when (val result = linearX.register(tokenTable)) {
+            is Ok -> {}
+
+            is Failed -> {
+                return Failed(result.error)
+            }
+        }
+
         return ok
     }
 

@@ -55,7 +55,7 @@ class LinearFunction(
 
         if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             polynomial.value(tokenTable)?.let { yValue ->
-                if (polynomial.category == Linear) {
+                if (polynomial.category != Linear) {
                     logger.trace { "Setting LinearFunction ${name}.y initial solution: $yValue" }
                     tokenTable.find(y)?.let { token ->
                         token._result = yValue

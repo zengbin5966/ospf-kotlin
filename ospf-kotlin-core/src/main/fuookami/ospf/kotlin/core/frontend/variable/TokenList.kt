@@ -18,7 +18,7 @@ private fun tokenIndexMap(tokens: Collection<Token>): BiMap<Token, Int> {
 sealed interface AbstractTokenList {
     val tokens: Collection<Token>
     val tokenIndexMap: BiMap<Token, Int>
-    val cachedSolution: Boolean get() = tokens.all { it.result != null }
+    val cachedSolution: Boolean get() = tokens.any { it.result != null }
 
     operator fun get(index: Int): Token {
         return tokenIndexMap.inverse[index] ?: tokens.find { it.solverIndex == index }!!
@@ -90,7 +90,7 @@ sealed class MutableTokenList(
         }
     override val cachedSolution: Boolean get() {
         return synchronized(lock) {
-            tokens.all { it.result != null }
+            tokens.any { it.result != null }
         }
     }
 

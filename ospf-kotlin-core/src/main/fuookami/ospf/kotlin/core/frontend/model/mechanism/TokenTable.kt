@@ -1,6 +1,5 @@
 package fuookami.ospf.kotlin.core.frontend.model.mechanism
 
-import java.util.concurrent.*
 import kotlin.collections.*
 import kotlinx.coroutines.*
 import io.michaelrocks.bimap.*

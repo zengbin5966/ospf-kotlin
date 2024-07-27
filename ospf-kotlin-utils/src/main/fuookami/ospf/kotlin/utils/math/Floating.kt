@@ -339,7 +339,7 @@ value class FltX(internal val value: BigDecimal) : FloatingImpl<FltX>, Copyable<
     constructor(value: Long, scale: Int = 2) : this(BigDecimal.valueOf(value).setScale(scale))
     constructor(value: String, scale: Int = 2) : this(BigDecimal(value).setScale(scale))
 
-    fun withScale(scale: Int) = FltX(value.setScale(scale))
+    fun withScale(scale: Int, roundingMode: RoundingMode = RoundingMode.HALF_UP) = FltX(value.setScale(scale, roundingMode))
 
     override val constants: FloatingNumberConstants<FltX> get() = Companion
 

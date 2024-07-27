@@ -151,8 +151,8 @@ sealed class AbstractSlackFunction<V : Variable<*>>(
         if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             val xValue = x.value(tokenTable) ?: return
             val yValue = y.value(tokenTable) ?: return
-            val negValue = yValue - xValue
-            val posValue = xValue - yValue
+            val negValue = max(Flt64.zero, yValue - xValue)
+            val posValue = max(Flt64.zero, xValue - yValue)
 
             if (_neg != null) {
                 logger.trace { "Setting SlackFunction ${name}.neg initial solution: $negValue" }
