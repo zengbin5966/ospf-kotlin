@@ -336,10 +336,11 @@ value class FltX(internal val value: BigDecimal) : FloatingImpl<FltX>, Copyable<
     }
 
     constructor(value: Double, scale: Int = decimalDigits, roundingMode: RoundingMode = RoundingMode.HALF_UP) : this(BigDecimal.valueOf(value).setScale(scale, roundingMode))
-    constructor(value: Long, scale: Int = 2) : this(BigDecimal.valueOf(value).setScale(scale))
-    constructor(value: String, scale: Int = 2) : this(BigDecimal(value).setScale(scale))
+    constructor(value: Long, scale: Int = 2, roundingMode: RoundingMode = RoundingMode.HALF_UP) : this(BigDecimal.valueOf(value).setScale(scale, roundingMode))
+    constructor(value: String, scale: Int = decimalDigits, roundingMode: RoundingMode = RoundingMode.HALF_UP) : this(BigDecimal(value).setScale(scale, roundingMode))
 
-    fun withScale(scale: Int, roundingMode: RoundingMode = RoundingMode.HALF_UP) = FltX(value.setScale(scale, roundingMode))
+    fun withScale(scale: Int) = FltX(value.setScale(scale))
+    fun withScale(scale: Int, roundingMode: RoundingMode) = FltX(value.setScale(scale, roundingMode))
 
     override val constants: FloatingNumberConstants<FltX> get() = Companion
 
