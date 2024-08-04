@@ -46,3 +46,7 @@ data class FundamentalQuantity(val dimension: FundamentalQuantityDimension, val 
 
     override fun toString() = "$dimension$index"
 }
+
+operator fun FundamentalQuantityDimension.times(index: Int) = FundamentalQuantity(this, index)
+operator fun FundamentalQuantity.times(index: Int) = FundamentalQuantity(dimension, index * this.index)
+operator fun FundamentalQuantity.div(index: Int) = FundamentalQuantity(dimension, this.index / index)
