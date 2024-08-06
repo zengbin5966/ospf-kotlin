@@ -25,10 +25,12 @@ class IntDivFunction(
 
     private val q: IntVar by lazy {
         val q = IntVar("${name}_q")
-        q.range.set(ValueRange(
-            possibleRange.lowerBound.unwrap().toInt64(),
-            possibleRange.upperBound.unwrap().toInt64()
-        ))
+        q.range.set(
+            ValueRange(
+                possibleRange.lowerBound.unwrap().toInt64(),
+                possibleRange.upperBound.unwrap().toInt64()
+            )
+        )
         q
     }
 
@@ -44,20 +46,21 @@ class IntDivFunction(
         y
     }
 
-    private val possibleRange: ValueRange<Flt64> get() {
-        return if (d.range.range.contains(Flt64.zero)) {
-            ValueRange(
-                (x.upperBound / d.lowerBound).floor(),
-                Flt64.maximum
-            )
-        } else {
-            val q1 = (x.upperBound / d.upperBound).floor()
-            val q2 = (x.upperBound / d.lowerBound).floor()
-            val q3 = (x.lowerBound / d.upperBound).floor()
-            val q4 = (x.lowerBound / d.lowerBound).floor()
-            ValueRange(min(q1, q2, q3, q4), max(q1, q2, q3, q4))
+    private val possibleRange: ValueRange<Flt64>
+        get() {
+            return if (d.range.range.contains(Flt64.zero)) {
+                ValueRange(
+                    (x.upperBound / d.lowerBound).floor(),
+                    Flt64.maximum
+                )
+            } else {
+                val q1 = (x.upperBound / d.upperBound).floor()
+                val q2 = (x.upperBound / d.lowerBound).floor()
+                val q3 = (x.lowerBound / d.upperBound).floor()
+                val q4 = (x.lowerBound / d.lowerBound).floor()
+                ValueRange(min(q1, q2, q3, q4), max(q1, q2, q3, q4))
+            }
         }
-    }
 
     private val possibleModUpperBound
         get() = max(

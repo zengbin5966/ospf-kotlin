@@ -20,10 +20,12 @@ class IntDivFunction(
 
     private val q: IntVar by lazy {
         val q = IntVar("${name}_q")
-        q.range.set(ValueRange(
-            possibleRange.lowerBound.unwrap().toInt64(),
-            possibleRange.upperBound.unwrap().toInt64()
-        ))
+        q.range.set(
+            ValueRange(
+                possibleRange.lowerBound.unwrap().toInt64(),
+                possibleRange.upperBound.unwrap().toInt64()
+            )
+        )
         q
     }
 
@@ -53,10 +55,11 @@ class IntDivFunction(
     override val cells get() = y.cells
     override val cached get() = y.cached
 
-    private val possibleRange get() = ValueRange(
-        (x.lowerBound / d).floor(),
-        (x.upperBound / d).floor()
-    )
+    private val possibleRange
+        get() = ValueRange(
+            (x.lowerBound / d).floor(),
+            (x.upperBound / d).floor()
+        )
 
     private val possibleModUpperBound
         get() = if (d geq Flt64.zero) {

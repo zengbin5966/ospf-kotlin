@@ -16,7 +16,7 @@ class IfFunction(
     override var displayName: String? = null
 ) : LinearLogicFunctionSymbol {
     private val logger = logger()
-    
+
     private val inequality by lazy {
         inequality.normalize()
     }
@@ -64,7 +64,7 @@ class IfFunction(
     override suspend fun prepare(tokenTable: AbstractTokenTable) {
         inequality.lhs.cells
         inequality.rhs.cells
-        
+
         if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             inequality.isTrue(tokenTable)?.let { bin ->
                 val yValue = if (bin) {
@@ -72,12 +72,12 @@ class IfFunction(
                 } else {
                     Flt64.zero
                 }
-                
+
                 logger.trace { "Setting IfFunction ${name}.y to $bin" }
                 tokenTable.find(y)?.let { token ->
                     token._result = yValue
                 }
-                
+
                 tokenTable.cache(this, null, yValue)
             }
         }

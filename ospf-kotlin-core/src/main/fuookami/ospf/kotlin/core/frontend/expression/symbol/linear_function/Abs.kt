@@ -74,14 +74,28 @@ class AbsFunction(
             x.value(tokenTable)?.let { xValue ->
                 val pValue = xValue geq Flt64.zero
                 val yValue = abs(xValue)
-                val posValue = if (pValue) { yValue / m } else { Flt64.zero }
-                val negValue = if (!pValue) { yValue / m } else { Flt64.zero }
+                val posValue = if (pValue) {
+                    yValue / m
+                } else {
+                    Flt64.zero
+                }
+                val negValue = if (!pValue) {
+                    yValue / m
+                } else {
+                    Flt64.zero
+                }
                 logger.trace { "Setting AbsFunction ${name}.pos initial solution: $posValue" }
                 tokenTable.find(pos)?.let { token -> token._result = posValue }
                 logger.trace { "Setting AbsFunction ${name}.neg initial solution: $negValue" }
                 tokenTable.find(neg)?.let { token -> token._result = negValue }
                 logger.trace { "Setting AbsFunction ${name}.p initial solution: $pValue" }
-                tokenTable.find(p)?.let { token -> token._result = if (pValue) { Flt64.one } else { Flt64.zero } }
+                tokenTable.find(p)?.let { token ->
+                    token._result = if (pValue) {
+                        Flt64.one
+                    } else {
+                        Flt64.zero
+                    }
+                }
 
                 tokenTable.cache(this, null, yValue)
             }

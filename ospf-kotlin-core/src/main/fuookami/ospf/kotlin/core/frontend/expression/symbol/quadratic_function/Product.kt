@@ -61,9 +61,10 @@ class ProductFunction(
     override val cells get() = polyY.cells
     override val cached get() = polyY.cached
 
-    private val possibleRange get() = polynomials.fold(ValueRange(Flt64.one, Flt64.one)) { lhs, rhs ->
-        lhs * rhs.range.valueRange
-    }
+    private val possibleRange
+        get() = polynomials.fold(ValueRange(Flt64.one, Flt64.one)) { lhs, rhs ->
+            lhs * rhs.range.valueRange
+        }
 
     override fun flush(force: Boolean) {
         for (polynomial in polynomials) {

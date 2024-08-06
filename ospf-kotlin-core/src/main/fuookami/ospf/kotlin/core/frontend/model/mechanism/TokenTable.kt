@@ -192,9 +192,9 @@ sealed class MutableTokenTable(
     }
 
     override fun cached(symbol: Symbol, solution: List<Flt64>?): Boolean {
-         return synchronized(lock) {
-             cachedSymbolValue.containsKey(symbol to solution)
-         }
+        return synchronized(lock) {
+            cachedSymbolValue.containsKey(symbol to solution)
+        }
     }
 
     override fun cachedValue(symbol: Symbol, solution: List<Flt64>?): Flt64? {

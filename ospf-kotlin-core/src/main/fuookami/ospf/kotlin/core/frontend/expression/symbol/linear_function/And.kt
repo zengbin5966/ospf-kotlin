@@ -281,11 +281,13 @@ private class AndFunctionMultiPolynomialBinaryImpl(
                 }
             }
 
-            tokenTable.cache(parent, null, if (yValue) {
-                Flt64.one
-            } else {
-                Flt64.zero
-            })
+            tokenTable.cache(
+                parent, null, if (yValue) {
+                    Flt64.one
+                } else {
+                    Flt64.zero
+                }
+            )
         }
     }
 

@@ -50,6 +50,18 @@ data class TimeWindow(
         duration.round().toDouble().toDuration(durationUnit)
     }
 
+    fun durationOf(duration: Int64) = if (continues) {
+        duration.toFlt64().toDouble().toDuration(durationUnit)
+    } else {
+        duration.toLong().toDuration(durationUnit)
+    }
+
+    fun durationOf(duration: UInt64) = if (continues) {
+        duration.toFlt64().toDouble().toDuration(durationUnit)
+    } else {
+        duration.toLong().toDuration(durationUnit)
+    }
+
     fun valueOf(timePoint: Instant) = if (continues) {
         Flt64((timePoint - window.start).toDouble(durationUnit))
     } else {
@@ -60,6 +72,12 @@ data class TimeWindow(
         window.start + timePoint.toDouble().toDuration(durationUnit)
     } else {
         window.start + timePoint.round().toDouble().toDuration(durationUnit)
+    }
+
+    fun instantOf(timePoint: UInt64) = if (continues) {
+        window.start + timePoint.toFlt64().toDouble().toDuration(durationUnit)
+    } else {
+        window.start + timePoint.toLong().toDuration(durationUnit)
     }
 
     val empty: Boolean by window::empty

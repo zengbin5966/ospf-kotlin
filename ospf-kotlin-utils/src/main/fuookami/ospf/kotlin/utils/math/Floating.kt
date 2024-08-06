@@ -312,7 +312,7 @@ data object FltXJsonSerializer : KSerializer<FltX> {
     }
 
     override fun serialize(encoder: Encoder, value: FltX) {
-        encoder.encodeString(value.toString())
+        encoder.encodeString(value.toPlainString())
     }
 }
 
@@ -347,6 +347,8 @@ value class FltX(internal val value: BigDecimal) : FloatingImpl<FltX>, Copyable<
     override fun copy() = FltX(value)
 
     override fun toString() = value.toString()
+    fun toEngineeringString(): String = value.stripTrailingZeros().toEngineeringString()
+    fun toPlainString(): String = value.stripTrailingZeros().toPlainString()
 
     override fun partialOrd(rhs: FltX) = orderOf(value.compareTo(rhs.value))
     override fun partialEq(rhs: FltX) = (value.compareTo(rhs.value) == 0)

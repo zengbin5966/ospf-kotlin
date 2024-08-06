@@ -3,7 +3,7 @@ package fuookami.ospf.kotlin.utils.math
 data class Scale(
     val scales: List<Pair<Flt64, Flt64>> = emptyList()
 ) {
-    constructor(base: Flt64, index: Flt64): this(listOf(base to index))
+    constructor(base: Flt64, index: Flt64) : this(listOf(base to index))
 
     val value by lazy {
         scales.fold(Flt64.one) { acc, scale ->

@@ -46,10 +46,11 @@ class InStepRangeFunction(
     override val cells get() = y.cells
     override val cached get() = y.cached
 
-    private val possibleRange get() = ValueRange(
-        lb.lowerBound,
-        ub.upperBound
-    )
+    private val possibleRange
+        get() = ValueRange(
+            lb.lowerBound,
+            ub.upperBound
+        )
 
     override fun flush(force: Boolean) {
         lb.flush(force)

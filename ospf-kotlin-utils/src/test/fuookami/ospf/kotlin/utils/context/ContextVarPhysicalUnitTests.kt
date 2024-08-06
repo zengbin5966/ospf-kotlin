@@ -2,7 +2,7 @@ package fuookami.ospf.kotlin.utils.context
 
 import org.junit.jupiter.api.*
 
-class ContextVarUnitTests {
+class ContextVarPhysicalUnitTests {
     val contextVar = ContextVar(1)
 
     private fun stack2() {

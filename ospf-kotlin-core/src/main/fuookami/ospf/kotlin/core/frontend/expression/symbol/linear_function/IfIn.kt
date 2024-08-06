@@ -18,7 +18,7 @@ class IfInFunction(
     override var displayName: String? = null
 ) : LinearLogicFunctionSymbol {
     private val logger = logger()
-    
+
     private val lb = lowerBound
     private val ub = upperBound
 
@@ -83,7 +83,7 @@ class IfInFunction(
             inequality.lhs.cells
             inequality.rhs.cells
         }
-        
+
         if (tokenTable.cachedSolution && tokenTable.cached(this) == false) {
             val bins = inequalities.map { it.isTrue(tokenTable) }
             if (bins.all { it != null }) {
@@ -93,12 +93,12 @@ class IfInFunction(
                 } else {
                     Flt64.zero
                 }
-                
+
                 logger.trace { "Setting IfInFunction ${name}.y initial solution: $bin" }
                 tokenTable.find(y)?.let { token ->
                     token._result = yValue
                 }
-                
+
                 tokenTable.cache(this, null, yValue)
             }
         }

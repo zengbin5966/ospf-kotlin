@@ -88,11 +88,12 @@ sealed class MutableTokenList(
             }
             return _tokenIndexMap
         }
-    override val cachedSolution: Boolean get() {
-        return synchronized(lock) {
-            tokens.any { it.result != null }
+    override val cachedSolution: Boolean
+        get() {
+            return synchronized(lock) {
+                tokens.any { it.result != null }
+            }
         }
-    }
 
     fun add(item: AbstractVariableItem<*, *>): Try {
         synchronized(lock) {
