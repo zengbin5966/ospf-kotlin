@@ -2,13 +2,13 @@ package fuookami.ospf.kotlin.utils.physics.unit
 
 import fuookami.ospf.kotlin.utils.physics.dimension.*
 
-data object SquaredMeter : PhysicalUnit() {
-    private val unit = Meter * Meter
+data object Joule : PhysicalUnit() {
+    private val unit = Watt * Second
 
-    override val name = "square meter"
-    override val symbol = "m2"
+    override val name = "joule"
+    override val symbol = "J"
 
-    override val quantity = Area
+    override val quantity = Energy
     override val system by unit::system
     override val scale by unit::scale
 }

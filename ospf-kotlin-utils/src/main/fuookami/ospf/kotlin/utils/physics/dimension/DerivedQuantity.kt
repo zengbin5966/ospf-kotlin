@@ -1,14 +1,11 @@
 package fuookami.ospf.kotlin.utils.physics.dimension
 
-interface DerivedQuantity {
-    val name: String? get() = null
-    val quantities: List<FundamentalQuantity>
-}
+class DerivedQuantity(
+    quantities: List<FundamentalQuantity>,
+    val name: String? = null
+) {
+    val quantities = quantities.sortedBy { it.dimension }
 
-data class AnonymousDerivedQuantity(
-    override val quantities: List<FundamentalQuantity>,
-    override val name: String? = null
-) : DerivedQuantity {
     constructor(dimension: FundamentalQuantityDimension, name: String? = null) : this(listOf(FundamentalQuantity(dimension)), name)
     constructor(quantity: FundamentalQuantity, name: String? = null) : this(listOf(quantity), name)
 
@@ -20,7 +17,7 @@ data class AnonymousDerivedQuantity(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as AnonymousDerivedQuantity
+        other as DerivedQuantity
 
         return quantities == other.quantities
     }
@@ -30,39 +27,39 @@ data class AnonymousDerivedQuantity(
     }
 }
 
-operator fun FundamentalQuantity.times(other: FundamentalQuantity): AnonymousDerivedQuantity {
+operator fun FundamentalQuantity.times(other: FundamentalQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     indexes[this.dimension] = indexes.getOrDefault(this.dimension, 0) + this.index
     indexes[other.dimension] = indexes.getOrDefault(other.dimension, 0) + other.index
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }
 
 operator fun FundamentalQuantity.div(other: FundamentalQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     indexes[this.dimension] = indexes.getOrDefault(this.dimension, 0) + this.index
     indexes[other.dimension] = indexes.getOrDefault(other.dimension, 0) - other.index
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }
 
-operator fun FundamentalQuantity.times(other: DerivedQuantity): AnonymousDerivedQuantity {
+operator fun FundamentalQuantity.times(other: DerivedQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     for (quantity in other.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) + quantity.index
     }
     indexes[this.dimension] = indexes.getOrDefault(this.dimension, 0) + this.index
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }
 
-operator fun FundamentalQuantity.div(other: DerivedQuantity): AnonymousDerivedQuantity {
+operator fun FundamentalQuantity.div(other: DerivedQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     for (quantity in other.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) - quantity.index
     }
     indexes[this.dimension] = indexes.getOrDefault(this.dimension, 0) + this.index
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }
 
-operator fun DerivedQuantity.times(other: DerivedQuantity): AnonymousDerivedQuantity {
+operator fun DerivedQuantity.times(other: DerivedQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     for (quantity in this.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) + quantity.index
@@ -70,10 +67,10 @@ operator fun DerivedQuantity.times(other: DerivedQuantity): AnonymousDerivedQuan
     for (quantity in other.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) + quantity.index
     }
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }
 
-operator fun DerivedQuantity.div(other: DerivedQuantity): AnonymousDerivedQuantity {
+operator fun DerivedQuantity.div(other: DerivedQuantity): DerivedQuantity {
     val indexes = mutableMapOf<FundamentalQuantityDimension, Int>()
     for (quantity in this.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) + quantity.index
@@ -81,5 +78,5 @@ operator fun DerivedQuantity.div(other: DerivedQuantity): AnonymousDerivedQuanti
     for (quantity in other.quantities) {
         indexes[quantity.dimension] = indexes.getOrDefault(quantity.dimension, 0) - quantity.index
     }
-    return AnonymousDerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
+    return DerivedQuantity(indexes.map { FundamentalQuantity(it.key, it.value) })
 }

@@ -1,14 +1,40 @@
 package fuookami.ospf.kotlin.utils.physics.dimension
 
 // L^2
-val Area = AnonymousDerivedQuantity(
+val Area = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, 2)
     ), "area"
 )
 
+// L t^-2
+val Acceleration = DerivedQuantity(
+    listOf(
+        FundamentalQuantity(FundamentalQuantityDimension.Length, 1),
+        FundamentalQuantity(FundamentalQuantityDimension.Time, -2)
+    ), "acceleration"
+)
+
+// L^2 m t^-2
+val Energy = DerivedQuantity(
+    listOf(
+        FundamentalQuantity(FundamentalQuantityDimension.Length, 1),
+        FundamentalQuantity(FundamentalQuantityDimension.Mass, 2),
+        FundamentalQuantity(FundamentalQuantityDimension.Time, -2)
+    ), "energy"
+)
+
+// L m t^-2
+val Force = DerivedQuantity(
+    listOf(
+        FundamentalQuantity(FundamentalQuantityDimension.Length, 1),
+        FundamentalQuantity(FundamentalQuantityDimension.Mass, 1),
+        FundamentalQuantity(FundamentalQuantityDimension.Time, -2)
+    ), "force"
+)
+
 // L^3 t^-1
-val FlowVelocity = AnonymousDerivedQuantity(
+val FlowVelocity = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, 3),
         FundamentalQuantity(FundamentalQuantityDimension.Time, -1)
@@ -16,21 +42,30 @@ val FlowVelocity = AnonymousDerivedQuantity(
 )
 
 // L
-val Length = AnonymousDerivedQuantity(FundamentalQuantityDimension.Length, "length")
+val Length = DerivedQuantity(FundamentalQuantityDimension.Length, "length")
 
 // m
-val Mass = AnonymousDerivedQuantity(FundamentalQuantityDimension.Mass, "mass")
+val Mass = DerivedQuantity(FundamentalQuantityDimension.Mass, "mass")
 
 // L^-3 m
-val MassDensity = AnonymousDerivedQuantity(
+val MassDensity = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, -3),
         FundamentalQuantity(FundamentalQuantityDimension.Mass, 1)
     ), "mass density"
 )
 
+// L^2 m t^-3
+val Power = DerivedQuantity(
+    listOf(
+        FundamentalQuantity(FundamentalQuantityDimension.Length, 2),
+        FundamentalQuantity(FundamentalQuantityDimension.Mass, 1),
+        FundamentalQuantity(FundamentalQuantityDimension.Time, -3)
+    ), "power"
+)
+
 // L^-2 m
-val SurfaceDensity = AnonymousDerivedQuantity(
+val SurfaceDensity = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, -2),
         FundamentalQuantity(FundamentalQuantityDimension.Mass, 1)
@@ -38,10 +73,10 @@ val SurfaceDensity = AnonymousDerivedQuantity(
 )
 
 // t
-val Time = AnonymousDerivedQuantity(FundamentalQuantityDimension.Time, "time")
+val Time = DerivedQuantity(FundamentalQuantityDimension.Time, "time")
 
 // L^1 t^-1
-val Velocity = AnonymousDerivedQuantity(
+val Velocity = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, 1),
         FundamentalQuantity(FundamentalQuantityDimension.Time, -1)
@@ -49,7 +84,7 @@ val Velocity = AnonymousDerivedQuantity(
 )
 
 // L^3
-val Volume = AnonymousDerivedQuantity(
+val Volume = DerivedQuantity(
     listOf(
         FundamentalQuantity(FundamentalQuantityDimension.Length, 3)
     ), "volume"
