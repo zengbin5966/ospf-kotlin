@@ -1,6 +1,7 @@
 package fuookami.ospf.kotlin.core.frontend.variable
 
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.core.frontend.expression.*
 
 data class Range<T, V>(
@@ -10,8 +11,8 @@ data class Range<T, V>(
     _range = ValueRange(
         type.minimum,
         type.maximum,
-        IntervalType.Closed,
-        IntervalType.Closed,
+        Interval.Closed,
+        Interval.Closed,
         constants
     ),
     constants = constants

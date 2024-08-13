@@ -7,14 +7,13 @@ import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
 import fuookami.ospf.kotlin.utils.math.geometry.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.operator.*
 import fuookami.ospf.kotlin.utils.parallel.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.framework.bpp3d.infrastructure.*
-import fuookami.ospf.kotlin.framework.bpp3d.domain.item.model.*
 import fuookami.ospf.kotlin.framework.bpp3d.domain.item.service.*
-
 
 private data class PatternItemInfo(
     val item: Item,
@@ -155,7 +154,7 @@ sealed class Pattern {
             val yRange = ValueRange(y, maxY)
             var x = Flt64.zero
             for (placement in placements) {
-                val range = ValueRange(placement.y, placement.maxY, IntervalType.Closed, IntervalType.Open, Flt64)
+                val range = ValueRange(placement.y, placement.maxY, Interval.Closed, Interval.Open, Flt64)
                 if (!yRange.intersect(range).empty) {
                     x = max(x, placement.maxX)
                 }

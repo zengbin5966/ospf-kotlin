@@ -331,13 +331,21 @@ data class StorageResourceTimeSlot<
 typealias StorageResourceUsage<R, C> = ResourceUsage<StorageResourceTimeSlot<R, C>, R, C>
 
 abstract class AbstractStorageResourceUsage<
+    out E : Executor,
     out R : StorageResource<C>,
     out C : ResourceCapacity
 >(
     protected val timeWindow: TimeWindow,
-    resources: List<R>,
+    protected val executors: List<E>,
+    protected val resources: List<R>,
     interval: Duration = timeWindow.interval
 ) : AbstractResourceUsage<StorageResourceTimeSlot<R, C>, R, C>() {
+    abstract val executorSupply: LinearSymbols3
+    lateinit var supply: LinearSymbols2
+    abstract val cost: LinearSymbols2
+
+    override lateinit var quantity: LinearSymbols1
+
     final override val timeSlots: List<StorageResourceTimeSlot<R, C>>
 
     init {
@@ -360,20 +368,80 @@ abstract class AbstractStorageResourceUsage<
         }
         this.timeSlots = timeSlots
     }
+
+    override fun register(model: MetaModel): Try {
+        if (!::supply.isInitialized) {
+            supply = flatMap(
+                "${name}_supply",
+                resources,
+                timeWindow.timeSlots,
+                { resource, timeSlot ->
+                    val time = TimeRange(timeWindow.start, timeSlot.end)
+                    val fixedSupply = resource.fixedSupplyIn(time)
+                    val r = resources.indexOf(resource)
+                    val t = timeWindow.timeSlots.indexOf(time)
+                    LinearPolynomial(fixedSupply + sum(executorSupply[_a, r, t]))
+                },
+                { (_, r), (_, t) -> "${r}_${t}" }
+            )
+        }
+        when (val result = model.add(supply)) {
+            is Ok -> {}
+
+            is Failed -> {
+                return Failed(result.error)
+            }
+        }
+
+        if (timeSlots.isNotEmpty()) {
+            if (!::quantity.isInitialized) {
+                quantity = flatMap(
+                    "${name}_quantity",
+                    timeSlots,
+                    { s ->
+                        val t = timeWindow.timeSlots.indexOfFirst { it == s.time }
+                        val r = resources.indexOf(s.resource)
+                        LinearPolynomial(s.resource.initialQuantity + supply[r, t] - cost[r, t])
+                    },
+                    { (_, s) -> "$s" }
+                )
+                for (slot in timeSlots) {
+                    quantity[slot].range.set(
+                        ValueRange(
+                            slot.resourceCapacity.quantity.lowerBound.toFlt64() - (slot.resourceCapacity.lessQuantity ?: Flt64.zero),
+                            slot.resourceCapacity.quantity.upperBound.toFlt64() + (slot.resourceCapacity.overQuantity ?: Flt64.zero)
+                        )
+                    )
+                }
+            }
+            when (val result = model.add(quantity)) {
+                is Ok -> {}
+
+                is Failed -> {
+                    return Failed(result.error)
+                }
+            }
+        }
+
+        return super.register(model)
+    }
 }
 
 class TaskSchedulingStorageResourceUsage<
+    out E : Executor,
     out R : StorageResource<C>,
     out C : ResourceCapacity
 >(
     timeWindow: TimeWindow,
+    executors: List<E>,
     resources: List<R>,
     interval: Duration = timeWindow.interval,
     override val name: String,
     override val overEnabled: Boolean = false,
     override val lessEnabled: Boolean = false
-) : AbstractStorageResourceUsage<R, C>(timeWindow, resources, interval) {
-    override lateinit var quantity: LinearSymbols1
+) : AbstractStorageResourceUsage<E, R, C>(timeWindow, executors, resources, interval) {
+    override lateinit var executorSupply: LinearSymbols3
+    override lateinit var cost: LinearSymbols2
 
     override fun register(model: MetaModel): Try {
         TODO("NOT IMPLEMENT YET")
@@ -381,43 +449,59 @@ class TaskSchedulingStorageResourceUsage<
 }
 
 class IterativeTaskSchedulingStorageResourceUsage<
+    out E : Executor,
     out R : StorageResource<C>,
     out C : ResourceCapacity
 >(
     timeWindow: TimeWindow,
+    executors: List<E>,
     resources: List<R>,
     interval: Duration = timeWindow.interval,
     override val name: String
-) : AbstractStorageResourceUsage<R, C>(timeWindow, resources, interval) {
+) : AbstractStorageResourceUsage<E, R, C>(timeWindow, executors, resources, interval) {
+    override lateinit var executorSupply: LinearExpressionSymbols3
+    override lateinit var cost: LinearExpressionSymbols2
+
     override val overEnabled: Boolean = true
     override val lessEnabled: Boolean = true
 
-    override lateinit var quantity: LinearExpressionSymbols1
-
     override fun register(model: MetaModel): Try {
-        if (timeSlots.isNotEmpty()) {
-            if (!::quantity.isInitialized) {
-                quantity = flatMap(
-                    "${name}_quantity",
-                    timeSlots,
-                    { s ->
-                        val time = TimeRange(timeWindow.start, s.time.end)
-                        val fixedSupply = s.resource.fixedSupplyIn(time)
-                        val fixedCost = s.resource.fixedCostIn(time)
-                        LinearPolynomial(s.resource.initialQuantity + fixedSupply - fixedCost)
-                    },
-                    { (_, s) -> "$s" }
-                )
-                for (slot in timeSlots) {
-                    quantity[slot].range.set(
-                        ValueRange(
-                            slot.resourceCapacity.quantity.lowerBound.toFlt64() -
-                                    (slot.resourceCapacity.lessQuantity ?: Flt64.zero),
-                            slot.resourceCapacity.quantity.upperBound.toFlt64() +
-                                    (slot.resourceCapacity.overQuantity ?: Flt64.zero)
-                        )
-                    )
-                }
+        if (!::executorSupply.isInitialized) {
+            executorSupply = flatMap(
+                "${name}_executor_supply",
+                executors,
+                resources,
+                timeWindow.timeSlots,
+                { _, _, _ -> LinearPolynomial() },
+                { (_, e), (_, r), (_, t) -> "${e}_${r}_${t}" }
+            )
+        }
+        when (val result = model.add(executorSupply)) {
+            is Ok -> {}
+
+            is Failed -> {
+                return Failed(result.error)
+            }
+        }
+
+        if (!::cost.isInitialized) {
+            cost = flatMap(
+                "${name}_cost",
+                resources,
+                timeWindow.timeSlots,
+                { r, t ->
+                    val time = TimeRange(timeWindow.start, t.end)
+                    val fixedCost = r.fixedCostIn(time)
+                    LinearPolynomial(fixedCost)
+                },
+                { (_, r), (_, t) -> "${r}_${t}" }
+            )
+        }
+        when (val result = model.add(cost)) {
+            is Ok -> {}
+
+            is Failed -> {
+                return Failed(result.error)
             }
         }
 
@@ -434,30 +518,59 @@ class IterativeTaskSchedulingStorageResourceUsage<
         val xi = compilation.x[iteration.toInt()]
 
         coroutineScope {
-            for (slot in timeSlots) {
-                launch {
-                    val thisTasks = tasks.mapNotNull {
-                        val usedQuantity = slot.resource.usedQuantity(
-                            it,
-                            TimeRange(timeWindow.start, slot.time.end)
-                        )
-                        if (usedQuantity != Flt64.zero) {
-                            Pair(it, usedQuantity)
-                        } else {
-                            null
+            for ((e, executor) in executors.withIndex()) {
+                for ((r, resource) in resources.withIndex()) {
+                    for ((t, timeSlot) in timeWindow.timeSlots.withIndex()) {
+                        launch(Dispatchers.Default) {
+                            val thisTasks = tasks.mapNotNull { task ->
+                                if (task.executor != executor) {
+                                    return@mapNotNull null
+                                }
+                                val supplyQuantity = resource.supplyBy(
+                                    task,
+                                    TimeRange(timeWindow.start, timeSlot.end)
+                                )
+                                if (supplyQuantity != Flt64.zero) {
+                                    Pair(task, supplyQuantity)
+                                } else {
+                                    null
+                                }
+                            }
+
+                            if (thisTasks.isNotEmpty()) {
+                                executorSupply[e, r, t].flush()
+                                for ((task, supplyQuantity) in thisTasks) {
+                                    executorSupply[e, r, t].asMutable() += xi[task] * supplyQuantity
+                                }
+                            }
                         }
                     }
-
-                    if (thisTasks.isNotEmpty()) {
-                        quantity[slot].flush()
-                        for (task in thisTasks) {
-                            quantity[slot].asMutable() += task.second * xi[task.first]
+                }
+            }
+            for ((r, resource) in resources.withIndex()) {
+                for ((t, timeSlot) in timeWindow.timeSlots.withIndex()) {
+                    launch(Dispatchers.Default) {
+                        val thisTasks = tasks.mapNotNull { task ->
+                            val costQuantity = resource.costBy(
+                                task,
+                                TimeRange(timeWindow.start, timeSlot.end)
+                            )
+                            if (costQuantity != Flt64.zero) {
+                                Pair(task, costQuantity)
+                            } else {
+                                null
+                            }
+                        }
+                        if (thisTasks.isNotEmpty()) {
+                            cost[r, t].flush()
+                            for ((task, costQuantity) in thisTasks) {
+                                cost[r, t].asMutable() += xi[task] * costQuantity
+                            }
                         }
                     }
                 }
             }
         }
-
         return ok
     }
 }

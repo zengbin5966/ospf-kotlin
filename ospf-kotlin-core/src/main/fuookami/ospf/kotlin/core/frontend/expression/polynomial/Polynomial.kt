@@ -1,9 +1,9 @@
 package fuookami.ospf.kotlin.core.frontend.expression.polynomial
 
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.operator.*
-import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -193,8 +193,8 @@ internal fun possibleRange(
         ValueRange(
             constant,
             constant,
-            IntervalType.Closed,
-            IntervalType.Closed
+            Interval.Closed,
+            Interval.Closed
         )
     } else {
         var ret = monomials[0].range.range

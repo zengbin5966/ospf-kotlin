@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.utils.math.geometry
 
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 
 data class Rectangle<P : Point<D>, D : Dimension>(
     val p1: P,
@@ -49,14 +50,14 @@ fun Rectangle2.contains(
     val (minX, maxX) = minMax(p1.x, p2.x, p3.x, p4.x)
     val (minY, maxY) = minMax(p1.y, p2.y, p3.y, p4.y)
     val lowerInterval = if (withBorder && withLowerBound) {
-        IntervalType.Closed
+        Interval.Closed
     } else {
-        IntervalType.Open
+        Interval.Open
     }
     val upperInterval = if (withBorder && withUpperBound) {
-        IntervalType.Closed
+        Interval.Closed
     } else {
-        IntervalType.Open
+        Interval.Open
     }
     val xRange = ValueRange(minX, maxX, lowerInterval, upperInterval)
     val yRange = ValueRange(minY, maxY, lowerInterval, upperInterval)

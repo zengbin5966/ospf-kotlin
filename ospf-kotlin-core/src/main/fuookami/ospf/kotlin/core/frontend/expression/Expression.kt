@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression
 
 import kotlin.reflect.full.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 
@@ -31,8 +32,8 @@ open class ExpressionRange<V>(
                 _range = ValueRange(
                     constants.minimum,
                     constants.maximum,
-                    IntervalType.Closed,
-                    IntervalType.Closed,
+                    Interval.Closed,
+                    Interval.Closed,
                     constants
                 ),
                 constants = constants
@@ -92,8 +93,8 @@ open class ExpressionRange<V>(
                 ValueRange(
                     lowerBound!!,
                     ValueWrapper.Value(value.value(), constants),
-                    IntervalType.Closed,
-                    IntervalType.Closed,
+                    Interval.Closed,
+                    Interval.Closed,
                     constants
                 )
             )
@@ -112,8 +113,8 @@ open class ExpressionRange<V>(
                 ValueRange(
                     ValueWrapper.Value(value.value(), constants),
                     upperBound!!,
-                    IntervalType.Closed,
-                    IntervalType.Closed,
+                    Interval.Closed,
+                    Interval.Closed,
                     constants
                 )
             )
@@ -132,8 +133,8 @@ open class ExpressionRange<V>(
                 ValueRange(
                     ValueWrapper.Value(value.value(), constants),
                     ValueWrapper.Value(value.value(), constants),
-                    IntervalType.Closed,
-                    IntervalType.Closed,
+                    Interval.Closed,
+                    Interval.Closed,
                     constants
                 )
             )
@@ -148,8 +149,8 @@ open class ExpressionRange<V>(
                 ValueRange(
                     ValueWrapper.Value(lb.value(), constants),
                     ValueWrapper.Value(ub.value(), constants),
-                    IntervalType.Closed,
-                    IntervalType.Closed,
+                    Interval.Closed,
+                    Interval.Closed,
                     constants
                 )
             )
