@@ -1,4 +1,8 @@
 package fuookami.ospf.kotlin.utils.math.value_range
 
-class Bound {
+enum class BoundSide {
+    Lower,
+    Upper
 }
+
+sealed class Bound
