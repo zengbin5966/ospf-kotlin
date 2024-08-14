@@ -1,18 +1,10 @@
 package fuookami.ospf.kotlin.core.backend.plugins.scip
 
-import kotlin.time.*
-import kotlinx.datetime.*
 import jscip.*
-import fuookami.ospf.kotlin.utils.math.*
-import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
-import fuookami.ospf.kotlin.core.backend.intermediate_model.*
-import fuookami.ospf.kotlin.core.backend.solver.*
-import fuookami.ospf.kotlin.core.backend.solver.config.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
-import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 
-abstract class SCIPSolver {
+abstract class ScipSolver {
     companion object {
         init {
             System.loadLibrary("jscip")

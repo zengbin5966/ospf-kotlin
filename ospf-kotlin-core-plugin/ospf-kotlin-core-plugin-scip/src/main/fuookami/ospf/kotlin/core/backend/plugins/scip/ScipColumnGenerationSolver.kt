@@ -13,9 +13,9 @@ import fuookami.ospf.kotlin.core.backend.solver.output.*
 import fuookami.ospf.kotlin.core.frontend.model.Solution
 import fuookami.ospf.kotlin.framework.solver.*
 
-class SCIPColumnGenerationSolver(
+class ScipColumnGenerationSolver(
     private val config: SolverConfig = SolverConfig(),
-    private val callBack: SCIPSolverCallBack = SCIPSolverCallBack()
+    private val callBack: ScipSolverCallBack = ScipSolverCallBack()
 ) : ColumnGenerationSolver {
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun solveMILP(
@@ -41,7 +41,7 @@ class SCIPColumnGenerationSolver(
             jobs.add(GlobalScope.launch(Dispatchers.IO) { model.export("$name.lp", ModelFileFormat.LP) })
         }
 
-        val solver = SCIPLinearSolver(
+        val solver = ScipLinearSolver(
             config = config,
             callBack = callBack.copy()
         )
@@ -86,7 +86,7 @@ class SCIPColumnGenerationSolver(
         }
 
         val results = ArrayList<Solution>()
-        val solver = SCIPLinearSolver(
+        val solver = ScipLinearSolver(
             config = config,
             callBack = callBack.copy()
                 .configuration { scip, _, _ ->
@@ -159,7 +159,7 @@ class SCIPColumnGenerationSolver(
         var error: Error? = null
         return try {
             coroutineScope {
-                val solver = SCIPLinearSolver(
+                val solver = ScipLinearSolver(
                     config = config,
                     callBack = callBack
                 )

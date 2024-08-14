@@ -13,10 +13,10 @@ enum class Point {
     AnalyzingSolution
 }
 
-class SCIPSolverCallBack(
+class ScipSolverCallBack(
     private val map: MutableMap<Point, Function> = EnumMap(Point::class.java)
-) : Copyable<SCIPSolverCallBack> {
-    fun set(point: Point, function: Function): SCIPSolverCallBack {
+) : Copyable<ScipSolverCallBack> {
+    fun set(point: Point, function: Function): ScipSolverCallBack {
         map[point] = function
         return this
     }
@@ -32,8 +32,8 @@ class SCIPSolverCallBack(
         return map[point]?.invoke(scip, variables, constraints)
     }
 
-    override fun copy(): SCIPSolverCallBack {
-        return SCIPSolverCallBack(
+    override fun copy(): ScipSolverCallBack {
+        return ScipSolverCallBack(
             map.toMutableMap()
         )
     }

@@ -15,12 +15,12 @@ import fuookami.ospf.kotlin.core.backend.solver.*
 import fuookami.ospf.kotlin.core.backend.solver.config.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
 
-class SCIPQuadraticSolver(
+class ScipQuadraticSolver(
     private val config: SolverConfig = SolverConfig(),
-    private val callBack: SCIPSolverCallBack? = null
+    private val callBack: ScipSolverCallBack? = null
 ) : QuadraticSolver {
     override suspend operator fun invoke(model: QuadraticTetradModelView): Ret<SolverOutput> {
-        val impl = SCIPQuadraticSolverImpl(config, callBack)
+        val impl = ScipQuadraticSolverImpl(config, callBack)
         return impl(model)
     }
 
@@ -29,7 +29,7 @@ class SCIPQuadraticSolver(
             this(model).map { it to emptyList() }
         } else {
             val results = ArrayList<Solution>()
-            val impl = SCIPQuadraticSolverImpl(config, callBack.ifNull { SCIPSolverCallBack() }.copy()
+            val impl = ScipQuadraticSolverImpl(config, callBack.ifNull { ScipSolverCallBack() }.copy()
                 .configuration { scip, _, _ ->
                     scip.setIntParam("heuristics/dins/solnum", min(UInt64.ten, solutionAmount).toInt())
                     ok
@@ -40,7 +40,7 @@ class SCIPQuadraticSolver(
                     var i = UInt64.zero
                     for (sol in sols) {
                         if (sol != bestSol) {
-                            val thisResults = java.util.ArrayList<Flt64>()
+                            val thisResults = ArrayList<Flt64>()
                             for (scipVar in variables) {
                                 thisResults.add(Flt64(scip.getSolVal(sol, scipVar)))
                             }
@@ -60,10 +60,10 @@ class SCIPQuadraticSolver(
     }
 }
 
-private class SCIPQuadraticSolverImpl(
+private class ScipQuadraticSolverImpl(
     private val config: SolverConfig,
-    private val callBack: SCIPSolverCallBack? = null
-) : SCIPSolver() {
+    private val callBack: ScipSolverCallBack? = null
+) : ScipSolver() {
     var mip: Boolean = false
 
     lateinit var scipVars: List<jscip.Variable>
@@ -94,10 +94,10 @@ private class SCIPQuadraticSolverImpl(
         val processes = arrayOf(
             { it.init(model.name) },
             { it.dump(model) },
-            SCIPQuadraticSolverImpl::configure,
-            SCIPQuadraticSolverImpl::solve,
-            SCIPQuadraticSolverImpl::analyzeStatus,
-            SCIPQuadraticSolverImpl::analyzeSolution
+            ScipQuadraticSolverImpl::configure,
+            ScipQuadraticSolverImpl::solve,
+            ScipQuadraticSolverImpl::analyzeStatus,
+            ScipQuadraticSolverImpl::analyzeSolution
         )
         for (process in processes) {
             when (val result = process(this)) {
@@ -118,7 +118,7 @@ private class SCIPQuadraticSolverImpl(
                 it.lowerBound.toDouble(),
                 it.upperBound.toDouble(),
                 0.0,
-                SCIPVariable(it.type).toSCIPVar()
+                ScipVariable(it.type).toSCIPVar()
             )
         }.toList()
 

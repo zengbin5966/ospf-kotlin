@@ -15,12 +15,12 @@ import fuookami.ospf.kotlin.core.backend.solver.*
 import fuookami.ospf.kotlin.core.backend.solver.config.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
 
-class SCIPLinearSolver(
+class ScipLinearSolver(
     private val config: SolverConfig = SolverConfig(),
-    private val callBack: SCIPSolverCallBack? = null
+    private val callBack: ScipSolverCallBack? = null
 ) : LinearSolver {
     override suspend operator fun invoke(model: LinearTriadModelView): Ret<SolverOutput> {
-        val impl = SCIPLinearSolverImpl(config, callBack)
+        val impl = ScipLinearSolverImpl(config, callBack)
         return impl(model)
     }
 
@@ -29,7 +29,7 @@ class SCIPLinearSolver(
             this(model).map { it to emptyList() }
         } else {
             val results = ArrayList<Solution>()
-            val impl = SCIPLinearSolverImpl(config, callBack.ifNull { SCIPSolverCallBack() }.copy()
+            val impl = ScipLinearSolverImpl(config, callBack.ifNull { ScipSolverCallBack() }.copy()
                 .configuration { scip, _, _ ->
                     scip.setIntParam("heuristics/dins/solnum", min(UInt64.ten, solutionAmount).toInt())
                     ok
@@ -40,7 +40,7 @@ class SCIPLinearSolver(
                     var i = UInt64.zero
                     for (sol in sols) {
                         if (sol != bestSol) {
-                            val thisResults = java.util.ArrayList<Flt64>()
+                            val thisResults = ArrayList<Flt64>()
                             for (scipVar in variables) {
                                 thisResults.add(Flt64(scip.getSolVal(sol, scipVar)))
                             }
@@ -61,10 +61,10 @@ class SCIPLinearSolver(
     }
 }
 
-private class SCIPLinearSolverImpl(
+private class ScipLinearSolverImpl(
     private val config: SolverConfig,
-    private val callBack: SCIPSolverCallBack? = null
-) : SCIPSolver() {
+    private val callBack: ScipSolverCallBack? = null
+) : ScipSolver() {
     var mip: Boolean = false
 
     lateinit var scipVars: List<jscip.Variable>
@@ -87,10 +87,10 @@ private class SCIPLinearSolverImpl(
         val processes = arrayOf(
             { it.init(model.name) },
             { it.dump(model) },
-            SCIPLinearSolverImpl::configure,
-            SCIPLinearSolverImpl::solve,
-            SCIPLinearSolverImpl::analyzeStatus,
-            SCIPLinearSolverImpl::analyzeSolution
+            ScipLinearSolverImpl::configure,
+            ScipLinearSolverImpl::solve,
+            ScipLinearSolverImpl::analyzeStatus,
+            ScipLinearSolverImpl::analyzeSolution
         )
         for (process in processes) {
             when (val result = process(this)) {
@@ -111,7 +111,7 @@ private class SCIPLinearSolverImpl(
                 it.lowerBound.toDouble(),
                 it.upperBound.toDouble(),
                 0.0,
-                SCIPVariable(it.type).toSCIPVar()
+                ScipVariable(it.type).toSCIPVar()
             )
         }.toList()
 
