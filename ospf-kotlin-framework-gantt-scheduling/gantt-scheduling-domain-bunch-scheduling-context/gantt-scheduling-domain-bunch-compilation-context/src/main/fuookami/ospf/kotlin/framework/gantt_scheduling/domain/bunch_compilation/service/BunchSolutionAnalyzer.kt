@@ -27,13 +27,13 @@ data object BunchSolutionAnalyzer {
                     break
                 }
 
-                if (token.belongsTo(xi) && token.result?.let { it eq Flt64.one } == true) {
+                if (token.belongsTo(xi) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
                     val assignedBunch = bunches[i][token.variable.vectorView[0]]
                     assignedBunches.add(assignedBunch)
                 }
             }
 
-            if (token.belongsTo(compilation.y) && token.result?.let { it eq Flt64.one } == true) {
+            if (token.belongsTo(compilation.y) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
                 canceledTasks.add(tasks[token.variable.vectorView[0]])
             }
         }

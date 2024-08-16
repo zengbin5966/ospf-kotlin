@@ -28,7 +28,7 @@ data object TaskSolutionAnalyzer {
                     break
                 }
 
-                if (token.belongsTo(xi) && token.result?.let { it eq Flt64.one } == true) {
+                if (token.belongsTo(xi) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
                     val assignedBunch = bunches[i][token.variable.vectorView[0]]
                     for (task in assignedBunch.tasks) {
                         when (val policy = task.assignmentPolicy) {
@@ -44,7 +44,7 @@ data object TaskSolutionAnalyzer {
                 }
             }
 
-            if (token.belongsTo(compilation.y) && token.result?.let { it eq Flt64.one } == true) {
+            if (token.belongsTo(compilation.y) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
                 canceledTask.add(tasks[token.variable.vectorView[0]])
             }
         }
