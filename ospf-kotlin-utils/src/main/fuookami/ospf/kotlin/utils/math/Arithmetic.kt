@@ -149,5 +149,9 @@ data object NegativeInfinity {
     override fun toString() = "-inf"
 }
 
-val <T> Collection<T>.usize: UInt64 get() = UInt64(size)
-val <K, V> Map<K, V>.usize: UInt64 get() = UInt64(size)
+val <T> Collection<T>.usize get() = UInt64(size)
+val <K, V> Map<K, V>.usize get() = UInt64(size)
+operator fun <T> List<T>.get(index: UInt32) = get(index.toInt())
+operator fun <T> MutableList<T>.set(index: UInt32, element: T) = set(index.toInt(), element)
+operator fun <T> List<T>.get(index: UInt64) = get(index.toInt())
+operator fun <T> MutableList<T>.set(index: UInt64, element: T) = set(index.toInt(), element)
