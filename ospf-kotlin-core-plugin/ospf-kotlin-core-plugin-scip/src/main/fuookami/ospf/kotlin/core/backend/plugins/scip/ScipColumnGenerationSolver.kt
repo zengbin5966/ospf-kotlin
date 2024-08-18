@@ -17,6 +17,8 @@ class ScipColumnGenerationSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: ScipSolverCallBack = ScipSolverCallBack()
 ) : ColumnGenerationSolver {
+    override val name = "scip"
+
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun solveMILP(
         name: String,

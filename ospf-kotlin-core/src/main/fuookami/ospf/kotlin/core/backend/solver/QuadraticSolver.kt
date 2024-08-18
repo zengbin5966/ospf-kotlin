@@ -8,6 +8,8 @@ import fuookami.ospf.kotlin.core.backend.intermediate_model.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
 
 interface QuadraticSolver {
+    val name: String
+
     suspend operator fun invoke(model: QuadraticTetradModelView): Ret<SolverOutput>
     suspend operator fun invoke(model: QuadraticTetradModelView, solutionAmount: UInt64): Ret<Pair<SolverOutput, List<Solution>>>
 

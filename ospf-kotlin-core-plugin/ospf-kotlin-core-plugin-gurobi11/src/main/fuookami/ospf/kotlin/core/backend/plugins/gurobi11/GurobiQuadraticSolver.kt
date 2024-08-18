@@ -19,6 +19,8 @@ class GurobiQuadraticSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: GurobiQuadraticSolverCallBack? = null
 ) : QuadraticSolver {
+    override val name = "gurobi"
+
     override suspend fun invoke(model: QuadraticTetradModelView): Ret<SolverOutput> {
         val impl = GurobiQuadraticSolverImpl(config, callBack)
         return impl(model)

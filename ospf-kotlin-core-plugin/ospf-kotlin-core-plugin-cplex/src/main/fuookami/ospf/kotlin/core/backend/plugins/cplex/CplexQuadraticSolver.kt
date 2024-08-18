@@ -21,6 +21,8 @@ class CplexQuadraticSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: CplexSolverCallBack? = null
 ) : QuadraticSolver {
+    override val name = "cplex"
+
     override suspend fun invoke(model: QuadraticTetradModelView): Ret<SolverOutput> {
         val impl = CplexQuadraticSolverImpl(config, callBack)
         return impl(model)

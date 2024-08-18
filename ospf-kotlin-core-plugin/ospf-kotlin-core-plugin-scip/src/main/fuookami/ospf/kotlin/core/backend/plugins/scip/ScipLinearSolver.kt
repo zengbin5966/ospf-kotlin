@@ -19,6 +19,8 @@ class ScipLinearSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: ScipSolverCallBack? = null
 ) : LinearSolver {
+    override val name = "scip"
+
     override suspend operator fun invoke(model: LinearTriadModelView): Ret<SolverOutput> {
         val impl = ScipLinearSolverImpl(config, callBack)
         return impl(model)

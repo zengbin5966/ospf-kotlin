@@ -20,6 +20,8 @@ class GurobiLinearSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: GurobiLinearSolverCallBack? = null
 ) : LinearSolver {
+    override val name = "gurobi"
+
     override suspend operator fun invoke(model: LinearTriadModelView): Ret<SolverOutput> {
         val impl = GurobiLinearSolverImpl(config, callBack)
         return impl(model)

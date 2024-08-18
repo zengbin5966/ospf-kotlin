@@ -17,6 +17,8 @@ class GurobiColumnGenerationSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: GurobiLinearSolverCallBack = GurobiLinearSolverCallBack()
 ) : ColumnGenerationSolver {
+    override val name = "gurobi"
+
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun solveMILP(
         name: String,

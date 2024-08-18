@@ -22,6 +22,8 @@ class CplexLinearSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: CplexSolverCallBack? = null
 ) : LinearSolver {
+    override val name = "cplex"
+
     override suspend operator fun invoke(model: LinearTriadModelView): Ret<SolverOutput> {
         val impl = CplexLinearSolverImpl(config, callBack)
         return impl(model)

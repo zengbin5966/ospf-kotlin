@@ -1,6 +1,7 @@
 package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.bunch_compilation.service
 
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.operator.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 import fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task.model.*
@@ -27,13 +28,13 @@ data object BunchSolutionAnalyzer {
                     break
                 }
 
-                if (token.belongsTo(xi) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
+                if (token.belongsTo(xi) && token.result?.let { abs(it - Flt64.one) leq Flt64(1e-5) } == true) {
                     val assignedBunch = bunches[i][token.variable.vectorView[0]]
                     assignedBunches.add(assignedBunch)
                 }
             }
 
-            if (token.belongsTo(compilation.y) && token.result?.let { (it - Flt64.one) leq Flt64(1e-5) } == true) {
+            if (token.belongsTo(compilation.y) && token.result?.let { abs(it - Flt64.one) leq Flt64(1e-5) } == true) {
                 canceledTasks.add(tasks[token.variable.vectorView[0]])
             }
         }

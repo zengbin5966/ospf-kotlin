@@ -19,6 +19,8 @@ class ScipQuadraticSolver(
     private val config: SolverConfig = SolverConfig(),
     private val callBack: ScipSolverCallBack? = null
 ) : QuadraticSolver {
+    override val name = "scip"
+
     override suspend operator fun invoke(model: QuadraticTetradModelView): Ret<SolverOutput> {
         val impl = ScipQuadraticSolverImpl(config, callBack)
         return impl(model)

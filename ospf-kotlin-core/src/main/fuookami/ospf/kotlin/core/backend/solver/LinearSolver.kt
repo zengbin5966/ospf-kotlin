@@ -8,6 +8,8 @@ import fuookami.ospf.kotlin.core.backend.intermediate_model.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
 
 interface LinearSolver {
+    val name: String
+
     suspend operator fun invoke(model: LinearTriadModelView): Ret<SolverOutput>
     suspend operator fun invoke(model: LinearTriadModelView, solutionAmount: UInt64): Ret<Pair<SolverOutput, List<Solution>>>
 

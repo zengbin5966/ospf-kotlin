@@ -8,6 +8,8 @@ import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 import fuookami.ospf.kotlin.core.backend.solver.output.*
 
 interface ColumnGenerationSolver {
+    val name: String
+
     suspend fun solveMILP(
         name: String,
         metaModel: LinearMetaModel,

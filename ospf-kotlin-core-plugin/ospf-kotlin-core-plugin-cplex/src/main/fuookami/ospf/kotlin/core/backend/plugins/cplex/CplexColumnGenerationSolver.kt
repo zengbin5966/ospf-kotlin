@@ -20,6 +20,8 @@ class CplexColumnGenerationSolver(
     val config: SolverConfig = SolverConfig(),
     val callBack: CplexSolverCallBack = CplexSolverCallBack()
 ) : ColumnGenerationSolver {
+    override val name = "cplex"
+
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun solveMILP(
         name: String,
