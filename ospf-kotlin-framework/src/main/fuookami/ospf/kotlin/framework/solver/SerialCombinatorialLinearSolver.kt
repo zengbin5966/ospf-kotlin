@@ -15,8 +15,23 @@ class SerialCombinatorialLinearSolver(
 ): LinearSolver {
     private val logger = logger()
 
-    constructor(solvers: Iterable<LinearSolver>): this(solvers.map { lazy { it } })
-    constructor(solvers: Iterable<() -> LinearSolver>): this(solvers.map { lazy { it() } })
+    companion object {
+        @JvmName("constructBySolvers")
+        operator fun invoke(
+            solvers: List<LinearSolver>,
+            stopErrorCode: Set<ErrorCode> = setOf(ErrorCode.ORModelNoSolution, ErrorCode.ORModelUnbounded)
+        ): SerialCombinatorialLinearSolver {
+            return SerialCombinatorialLinearSolver(solvers.map { lazy { it } }, stopErrorCode)
+        }
+
+        @JvmName("constructBySolverExtractors")
+        operator fun invoke(
+            solvers: List<() -> LinearSolver>,
+            stopErrorCode: Set<ErrorCode> = setOf(ErrorCode.ORModelNoSolution, ErrorCode.ORModelUnbounded)
+        ): SerialCombinatorialLinearSolver {
+            return SerialCombinatorialLinearSolver(solvers.map { lazy { it() } }, stopErrorCode)
+        }
+    }
 
     override val name: String by lazy { "SerialCombinatorial(${solvers.joinToString(",") { it.value.name }})" }
 
