@@ -230,7 +230,15 @@ data class LinearTriadModel(
                                 LinearConstraintCell(
                                     index,
                                     tokenIndexes[temp.token]!!,
-                                    temp.coefficient
+                                    temp.coefficient.let {
+                                        if (it.isInfinity()) {
+                                            Flt64.decimalPrecision.reciprocal()
+                                        } else if (it.isNegativeInfinity()) {
+                                            -Flt64.decimalPrecision.reciprocal()
+                                        } else {
+                                            it
+                                        }
+                                    }
                                 )
                             )
                         }
@@ -264,14 +272,12 @@ data class LinearTriadModel(
                         if (subObject.category == objectiveCategory) {
                             for (cell in subObject.cells) {
                                 val temp = cell as LinearCell
-                                coefficient[tokenIndexes[temp.token]!!] =
-                                    coefficient[tokenIndexes[temp.token]!!] + temp.coefficient
+                                coefficient[tokenIndexes[temp.token]!!] = coefficient[tokenIndexes[temp.token]!!] + temp.coefficient
                             }
                         } else {
                             for (cell in subObject.cells) {
                                 val temp = cell as LinearCell
-                                coefficient[tokenIndexes[temp.token]!!] =
-                                    coefficient[tokenIndexes[temp.token]!!] - temp.coefficient
+                                coefficient[tokenIndexes[temp.token]!!] = coefficient[tokenIndexes[temp.token]!!] - temp.coefficient
                             }
                         }
                     }
@@ -281,7 +287,15 @@ data class LinearTriadModel(
                         objective.add(
                             LinearObjectiveCell(
                                 i,
-                                coefficient[i]
+                                coefficient[i].let {
+                                    if (it.isInfinity()) {
+                                        Flt64.decimalPrecision.reciprocal()
+                                    } else if (it.isNegativeInfinity()) {
+                                        -Flt64.decimalPrecision.reciprocal()
+                                    } else {
+                                        it
+                                    }
+                                }
                             )
                         )
                     }

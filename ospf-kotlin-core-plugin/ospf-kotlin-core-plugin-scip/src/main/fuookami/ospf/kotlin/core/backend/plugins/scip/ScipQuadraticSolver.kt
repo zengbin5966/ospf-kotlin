@@ -271,9 +271,13 @@ private class ScipQuadraticSolverImpl(
 
     private suspend fun solve(): Try {
         val begin = Clock.System.now()
-        scip.solveConcurrent()
-        val stage = scip.stage
-        if (stage.swigValue() < SCIP_Stage.SCIP_STAGE_INITPRESOLVE.swigValue()) {
+        if (config.threadNum gr UInt64.one) {
+            scip.solveConcurrent()
+            val stage = scip.stage
+            if (stage.swigValue() < SCIP_Stage.SCIP_STAGE_INITPRESOLVE.swigValue()) {
+                scip.solve()
+            }
+        } else {
             scip.solve()
         }
         solvingTime = Clock.System.now() - begin

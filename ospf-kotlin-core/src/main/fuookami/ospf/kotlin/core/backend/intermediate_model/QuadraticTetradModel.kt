@@ -234,7 +234,15 @@ data class QuadraticTetradModel(
                                     index,
                                     tokenIndexes[temp.token1]!!,
                                     temp.token2?.let { tokenIndexes[it]!! },
-                                    temp.coefficient
+                                    temp.coefficient.let {
+                                        if (it.isInfinity()) {
+                                            Flt64.decimalPrecision.reciprocal()
+                                        } else if (it.isNegativeInfinity()) {
+                                            -Flt64.decimalPrecision.reciprocal()
+                                        } else {
+                                            it
+                                        }
+                                    }
                                 )
                             )
                         }
@@ -287,7 +295,15 @@ data class QuadraticTetradModel(
                                 QuadraticObjectiveCell(
                                     i,
                                     j,
-                                    value
+                                    value.let {
+                                        if (it.isInfinity()) {
+                                            Flt64.decimalPrecision.reciprocal()
+                                        } else if (it.isNegativeInfinity()) {
+                                            -Flt64.decimalPrecision.reciprocal()
+                                        } else {
+                                            it
+                                        }
+                                    }
                                 )
                             )
                         }
