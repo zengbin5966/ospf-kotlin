@@ -61,7 +61,7 @@ open class LogRecordStringRDAO(tableName: String) : Table<LogRecordStringRPO>(ta
     val type = enum<LogRecordType>("log_type").bindTo { it.type }
     val time = kotlinDatetime("log_time").bindTo { it.time }
     val availableTime = kotlinDatetime("available_time").bindTo { it.availableTime }
-    val value = varchar("log_content").bindTo { it.value }
+    val value = text("log_content").bindTo { it.value }
 }
 
 @OptIn(InternalSerializationApi::class)
