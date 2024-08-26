@@ -136,7 +136,7 @@ sealed class Pattern {
     }
 
     companion object {
-        fun BuildConfig(builder: ConfigBuilder.() -> Unit): ConfigBuilder {
+        fun buildConfig(builder: ConfigBuilder.() -> Unit): ConfigBuilder {
             val config = ConfigBuilder()
             builder(config)
             return config

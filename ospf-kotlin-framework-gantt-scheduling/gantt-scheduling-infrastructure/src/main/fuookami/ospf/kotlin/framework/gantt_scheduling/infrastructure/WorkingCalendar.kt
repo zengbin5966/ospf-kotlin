@@ -336,9 +336,4 @@ open class ContinuousProductivityCalendar<P, T>(
     timeWindow: TimeWindow,
     productivity: List<P>,
     unavailableTimes: List<TimeRange>? = null
-) : ProductivityCalendar<Flt64, P, T>(
-    timeWindow,
-    productivity,
-    unavailableTimes,
-    Flt64,
-    { it }) where P : Productivity<T>
+) : ProductivityCalendar<Flt64, P, T>(timeWindow, productivity, unavailableTimes, Flt64, { it }) where P : Productivity<T>

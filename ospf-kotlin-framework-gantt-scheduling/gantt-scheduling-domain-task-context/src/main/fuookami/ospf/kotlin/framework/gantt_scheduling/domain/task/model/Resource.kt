@@ -175,17 +175,6 @@ abstract class StorageResource<out C : ResourceCapacity>(
         bunch: AbstractTaskBunch<T, E, A>,
         time: TimeRange
     ): Flt64 {
-        var sum = Flt64.zero
-        for (i in bunch.tasks.indices) {
-            sum += usedQuantity(bunch.tasks[i], time)
-            when (val currentTime = bunch.tasks[i].time) {
-                is TimeRange -> {
-                    if (currentTime.end >= time.end) {
-                        break
-                    }
-                }
-            }
-        }
-        return sum
+        return supplyBy(bunch, time) - costBy(bunch, time)
     }
 }
