@@ -261,12 +261,30 @@ class LogRecordPersistenceSaving(
     }
 
     override fun <T : Any> invoke(serializer: KSerializer<T>, value: LogRecordPO<T>): Try {
-        runBlocking {
-            mutex.withLock {
-                if (db.dialect is SQLiteDialect) {
-                    stringQueue.add(value.stringRPO(serializer))
-                } else {
-                    byteQueue.add(value.byteRPO(serializer))
+        if (async) {
+            runBlocking {
+                mutex.withLock {
+                    if (db.dialect is SQLiteDialect) {
+                        stringQueue.add(value.stringRPO(serializer))
+                    } else {
+                        byteQueue.add(value.byteRPO(serializer))
+                    }
+                }
+            }
+        } else {
+            if (db.dialect is SQLiteDialect) {
+                val table = LogRecordStringRDAO(tableName)
+                db.useTransaction {
+                    it.connection.createStatement().use { stmt ->
+                        stmt.execute("PRAGMA busy_timeout = 30000;")
+                    }
+
+                    db.sequenceOf(table).add(value.stringRPO(serializer))
+                }
+            } else {
+                val table = LogRecordByteRDAO(tableName)
+                db.useTransaction {
+                    db.sequenceOf(table).add(value.byteRPO(serializer))
                 }
             }
         }
@@ -276,9 +294,22 @@ class LogRecordPersistenceSaving(
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("saveAsString")
     override operator fun <T : Any> invoke(serializer: (T) -> String, value: LogRecordPO<T>): Try {
-        runBlocking {
-            mutex.withLock {
-                stringQueue.add(value.stringRPO(serializer))
+        if (async) {
+            runBlocking {
+                mutex.withLock {
+                    stringQueue.add(value.stringRPO(serializer))
+                }
+            }
+        } else {
+            val table = LogRecordStringRDAO(tableName)
+            db.useTransaction {
+                if (db.dialect is SQLiteDialect) {
+                    it.connection.createStatement().use { stmt ->
+                        stmt.execute("PRAGMA busy_timeout = 30000;")
+                    }
+                }
+
+                db.sequenceOf(table).add(value.stringRPO(serializer))
             }
         }
         return ok
@@ -288,9 +319,22 @@ class LogRecordPersistenceSaving(
     @JvmName("saveAsBytes")
     @Synchronized
     override operator fun <T : Any> invoke(serializer: (T) -> ByteArray, value: LogRecordPO<T>): Try {
-        runBlocking {
-            mutex.withLock {
-                byteQueue.add(value.byteRPO(serializer))
+        if (async) {
+            runBlocking {
+                mutex.withLock {
+                    byteQueue.add(value.byteRPO(serializer))
+                }
+            }
+        } else {
+            val table = LogRecordByteRDAO(tableName)
+            db.useTransaction {
+                if (db.dialect is SQLiteDialect) {
+                    it.connection.createStatement().use { stmt ->
+                        stmt.execute("PRAGMA busy_timeout = 30000;")
+                    }
+                }
+
+                db.sequenceOf(table).add(value.byteRPO(serializer))
             }
         }
         return ok

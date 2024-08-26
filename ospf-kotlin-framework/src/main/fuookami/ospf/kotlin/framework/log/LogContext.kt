@@ -234,7 +234,6 @@ class LogContext private constructor(
     }
 
     @JvmName("saveAsBytes")
-    @OptIn(DelicateCoroutinesApi::class)
     fun <T : Any> save(
         step: String,
         serializer: (T) -> ByteArray,
