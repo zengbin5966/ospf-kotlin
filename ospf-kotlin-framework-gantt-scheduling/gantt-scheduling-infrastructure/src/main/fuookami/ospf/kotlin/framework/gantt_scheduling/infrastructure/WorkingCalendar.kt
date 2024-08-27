@@ -194,7 +194,7 @@ sealed class ProductivityCalendar<Q, P, T>(
     fun actualQuantity(
         material: T,
         time: TimeRange,
-        connectionTime: Duration
+        connectionTime: Duration = Duration.ZERO
     ): Q {
         val productivityCalendar = productivity.find(time, Productivity<T>::timeWindow)
         return actualQuantity(
@@ -208,7 +208,7 @@ sealed class ProductivityCalendar<Q, P, T>(
     suspend fun actualQuantityParallelly(
         material: T,
         time: TimeRange,
-        connectionTime: Duration
+        connectionTime: Duration = Duration.ZERO
     ): Q {
         val productivityCalendar = productivity.findParallelly(time, Productivity<T>::timeWindow)
         return actualQuantity(
@@ -224,7 +224,7 @@ sealed class ProductivityCalendar<Q, P, T>(
         startTime: Instant,
         productivityCalendar: List<Productivity<T>>,
         quantity: Q,
-        connectionTime: Duration
+        connectionTime: Duration = Duration.ZERO
     ): TimeRange {
         var currentTime = max(startTime, productivityCalendar.first().timeWindow.start)
         var restQuantity = quantity
@@ -264,7 +264,7 @@ sealed class ProductivityCalendar<Q, P, T>(
         endTime: Instant,
         productivityCalendar: List<Productivity<T>>,
         quantity: Q,
-        connectionTime: Duration
+        connectionTime: Duration = Duration.ZERO
     ): TimeRange {
         var currentTime = min(endTime, productivityCalendar.first().timeWindow.end)
         var restAmount = quantity
@@ -303,7 +303,7 @@ sealed class ProductivityCalendar<Q, P, T>(
         material: T,
         time: TimeRange,
         productivityCalendar: List<Productivity<T>>,
-        connectionTime: Duration
+        connectionTime: Duration = Duration.ZERO
     ): Q {
         var quantity = constants.zero
         for (calendar in productivityCalendar) {
