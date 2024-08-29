@@ -2,12 +2,13 @@ package fuookami.ospf.kotlin.utils.functional
 
 import java.util.*
 import kotlin.*
+import kotlin.time.*
+import kotlin.random.Random
 import kotlin.collections.*
 import kotlin.reflect.full.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
 import fuookami.ospf.kotlin.utils.operator.*
-import kotlin.random.Random
 
 fun <T> List<T>.shuffle(
     randomGenerator: Generator<Int> = { Random.nextInt(0, this.size) }
@@ -1033,6 +1034,14 @@ inline fun <K, V> Map<K, V>.toSortedMapWithPartialThreeWayComparator(
     crossinline comparator: PartialThreeWayComparator<K>
 ): SortedMap<K, V> {
     return this.toSortedMap { lhs, rhs -> comparator(lhs, rhs)?.value ?: 0 }
+}
+
+fun Iterable<Duration>.sum(): Duration {
+    return this.fold(Duration.ZERO) { acc, duration -> acc + duration }
+}
+
+inline fun <T> Iterable<T>.sumOf(crossinline extractor: Extractor<Duration, T>): Duration {
+    return this.fold(Duration.ZERO) { acc, duration -> acc + extractor(duration) }
 }
 
 @Suppress("UNCHECKED_CAST")
