@@ -379,7 +379,7 @@ abstract class AbstractStorageResourceUsage<
                     val time = TimeRange(timeWindow.start, timeSlot.end)
                     val fixedSupply = resource.fixedSupplyIn(time)
                     val r = resources.indexOf(resource)
-                    val t = timeWindow.timeSlots.indexOf(time)
+                    val t = timeWindow.timeSlots.indexOfFirst { it.end == time.end }
                     LinearPolynomial(fixedSupply + sum(executorSupply[_a, r, t]))
                 },
                 { (_, r), (_, t) -> "${r}_${t}" }
