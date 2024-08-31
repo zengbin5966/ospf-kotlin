@@ -1040,10 +1040,6 @@ fun Iterable<Duration>.sum(): Duration {
     return this.fold(Duration.ZERO) { acc, duration -> acc + duration }
 }
 
-inline fun <T> Iterable<T>.sumOf(crossinline extractor: Extractor<Duration, T>): Duration {
-    return this.fold(Duration.ZERO) { acc, duration -> acc + extractor(duration) }
-}
-
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> Iterable<T>.sum(): T where T : Arithmetic<T>, T : Plus<T, T> {
     var sum = (T::class.companionObjectInstance!! as ArithmeticConstants<T>).zero
