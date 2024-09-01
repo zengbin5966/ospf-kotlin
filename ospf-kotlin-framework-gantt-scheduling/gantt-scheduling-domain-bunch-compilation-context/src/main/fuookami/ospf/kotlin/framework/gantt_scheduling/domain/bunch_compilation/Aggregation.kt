@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.bunch_compilation
 import kotlin.time.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
@@ -253,7 +254,7 @@ abstract class AbstractBunchCompilationAggregation<
                     }
                 }
             ) {
-                y[task].range.set(ValueRange(Binary.minimum, Binary.maximum))
+                y[task].range.set(ValueRange(Binary.minimum, Binary.maximum).value!!)
             }
         }
         for (i in UInt64.zero..iteration) {
@@ -261,7 +262,7 @@ abstract class AbstractBunchCompilationAggregation<
 
             for (bunch in bunchesIteration[i.toInt()]) {
                 if (!removedBunches.contains(bunch)) {
-                    xi[bunch].range.set(ValueRange(Binary.minimum, Binary.maximum))
+                    xi[bunch].range.set(ValueRange(Binary.minimum, Binary.maximum).value!!)
                 }
             }
         }

@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -38,17 +39,17 @@ abstract class AbstractAndFunctionImpl(
 
     protected val possibleRange
         get() = ValueRange(
-            if (polynomials.any { it.lowerBound.toFlt64() eq Flt64.zero }) {
+            if (polynomials.any { it.lowerBound!!.value.unwrap() eq Flt64.zero }) {
                 Flt64.zero
             } else {
                 Flt64.one
             },
-            if (polynomials.any { it.upperBound.toFlt64() eq Flt64.zero }) {
+            if (polynomials.any { it.upperBound!!.value.unwrap() eq Flt64.zero }) {
                 Flt64.zero
             } else {
                 Flt64.one
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         for (polynomial in polynomials) {
@@ -342,7 +343,7 @@ class AndFunction(
     private val impl: AbstractAndFunctionImpl by lazy {
         impl ?: if (polynomials.size == 1) {
             AndFunctionOnePolynomialImpl(polynomials[0], this, name, displayName)
-        } else if (polynomials.all { it.discrete && it.upperBound leq Flt64.one }) {
+        } else if (polynomials.all { it.discrete && it.upperBound!!.value.unwrap() leq Flt64.one }) {
             AndFunctionMultiPolynomialBinaryImpl(polynomials, this, name, displayName)
         } else {
             AndFunctionMultiPolynomialImpl(polynomials, this, name, displayName)
@@ -372,7 +373,7 @@ class AndFunction(
     override fun register(tokenTable: MutableTokenTable): Try {
         // all polys must be ∈ (R - R-)
         for (polynomial in polynomials) {
-            if (polynomial.lowerBound ls Flt64.zero) {
+            if (polynomial.lowerBound!!.value.unwrap() ls Flt64.zero) {
                 return Failed(Err(ErrorCode.ApplicationFailed, "$name's domain of definition unsatisfied: $polynomial"))
             }
         }

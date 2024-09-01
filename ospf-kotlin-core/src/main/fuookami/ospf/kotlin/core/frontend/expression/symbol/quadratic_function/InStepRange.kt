@@ -1,6 +1,7 @@
 package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -55,8 +56,9 @@ class InStepRangeFunction(
 
     private val possibleRange
         get() = ValueRange(
-            lb.lowerBound,
-            ub.upperBound
+            lb.lowerBound!!,
+            ub.upperBound!!,
+            Flt64
         )
 
     override fun flush(force: Boolean) {

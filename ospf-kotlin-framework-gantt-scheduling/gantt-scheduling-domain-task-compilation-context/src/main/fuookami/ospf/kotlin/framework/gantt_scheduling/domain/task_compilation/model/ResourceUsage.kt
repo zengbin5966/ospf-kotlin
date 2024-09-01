@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task_compilation.
 import kotlin.time.*
 import kotlinx.coroutines.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
@@ -77,7 +78,7 @@ abstract class AbstractResourceUsage<
                             val slack = SlackFunction(
                                 UContinuous,
                                 x = LinearPolynomial(quantity[slot]),
-                                threshold = LinearPolynomial(slot.resourceCapacity.quantity.upperBound.toFlt64()),
+                                threshold = LinearPolynomial(slot.resourceCapacity.quantity.upperBound.value.unwrap()),
                                 constraint = false,
                                 name = "${name}_over_quantity_$slot"
                             )
@@ -110,7 +111,7 @@ abstract class AbstractResourceUsage<
                             val slack = SlackFunction(
                                 UContinuous,
                                 x = LinearPolynomial(quantity[slot]),
-                                threshold = LinearPolynomial(slot.resourceCapacity.quantity.lowerBound.toFlt64()),
+                                threshold = LinearPolynomial(slot.resourceCapacity.quantity.lowerBound.value.unwrap()),
                                 withPositive = false,
                                 constraint = false,
                                 name = "${name}_less_quantity_$slot"
@@ -163,7 +164,7 @@ data class ConnectionResourceTimeSlot<
         return usedBy(prevTask, task) neq Flt64.zero
     }
 
-    override fun toString() = "${resource}_${indexInRule}"
+    override fun toString() = "${resource}_${resourceCapacity}_${indexInRule}"
 }
 
 typealias ConnectionResourceUsage<R, C> = ResourceUsage<ConnectionResourceTimeSlot<R, C>, R, C>
@@ -240,7 +241,7 @@ data class ExecutionResourceTimeSlot<
         return task != null && usedBy(task) neq Flt64.zero
     }
 
-    override fun toString() = "${resource}_${indexInRule}"
+    override fun toString() = "${resource}_${resourceCapacity}_${indexInRule}"
 }
 
 typealias ExecutionResourceUsage<R, C> = ResourceUsage<ExecutionResourceTimeSlot<R, C>, R, C>
@@ -325,7 +326,7 @@ data class StorageResourceTimeSlot<
                 )
     }
 
-    override fun toString() = "${resource}_${indexInRule}"
+    override fun toString() = "${resource}_${resourceCapacity}_${indexInRule}"
 }
 
 typealias StorageResourceUsage<R, C> = ResourceUsage<StorageResourceTimeSlot<R, C>, R, C>
@@ -399,7 +400,7 @@ abstract class AbstractStorageResourceUsage<
                     "${name}_quantity",
                     timeSlots,
                     { s ->
-                        val t = timeWindow.timeSlots.indexOfFirst { it == s.time }
+                        val t = timeWindow.timeSlots.indexOfFirst { it.end == s.time.end }
                         val r = resources.indexOf(s.resource)
                         LinearPolynomial(s.resource.initialQuantity + supply[r, t] - cost[r, t])
                     },
@@ -408,9 +409,9 @@ abstract class AbstractStorageResourceUsage<
                 for (slot in timeSlots) {
                     quantity[slot].range.set(
                         ValueRange(
-                            slot.resourceCapacity.quantity.lowerBound.toFlt64() - (slot.resourceCapacity.lessQuantity ?: Flt64.zero),
-                            slot.resourceCapacity.quantity.upperBound.toFlt64() + (slot.resourceCapacity.overQuantity ?: Flt64.zero)
-                        )
+                            slot.resourceCapacity.quantity.lowerBound.value.unwrap() - (slot.resourceCapacity.lessQuantity ?: Flt64.zero),
+                            slot.resourceCapacity.quantity.upperBound.value.unwrap() + (slot.resourceCapacity.overQuantity ?: Flt64.zero)
+                        ).value!!
                     )
                 }
             }

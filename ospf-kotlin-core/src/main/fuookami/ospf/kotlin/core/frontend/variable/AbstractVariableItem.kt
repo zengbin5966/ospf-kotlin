@@ -60,17 +60,8 @@ abstract class AbstractVariableItem<T, Type : VariableType<T>>(
 
     val range = Range(type, constants)
 
-    val lowerBound: Flt64
-        get() = when (val value = range.lowerBound) {
-            is ValueWrapper<*> -> value.toFlt64()
-            null -> Flt64.nan
-        }
-
-    val upperBound: Flt64
-        get() = when (val value = range.upperBound) {
-            is ValueWrapper<*> -> value.toFlt64()
-            null -> Flt64.nan
-        }
+    val lowerBound: Bound<Flt64>? get() = range.lowerBound?.toFlt64()
+    val upperBound: Bound<Flt64>? get() = range.upperBound?.toFlt64()
 
     val key get() = VariableItemKey(identifier, index)
 

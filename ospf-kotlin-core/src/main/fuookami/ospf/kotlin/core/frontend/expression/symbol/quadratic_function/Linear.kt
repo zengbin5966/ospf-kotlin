@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -26,7 +27,7 @@ class LinearFunction(
             polynomial.copy()
         } else {
             val polyY = QuadraticPolynomial(y)
-            polyY.range.set(polynomial.range.valueRange)
+            polyY.range.set(polynomial.range.valueRange!!)
             polyY
         }
     }
@@ -46,8 +47,8 @@ class LinearFunction(
     override fun flush(force: Boolean) {
         polynomial.flush(force)
         polyY.flush(force)
-        y.range.set(polynomial.range.valueRange)
-        polyY.range.set(polynomial.range.valueRange)
+        y.range.set(polynomial.range.valueRange!!)
+        polyY.range.set(polynomial.range.valueRange!!)
     }
 
     override suspend fun prepare(tokenTable: AbstractTokenTable) {

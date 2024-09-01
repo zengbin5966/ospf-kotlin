@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -22,9 +23,9 @@ class IntDivFunction(
         val q = IntVar("${name}_q")
         q.range.set(
             ValueRange(
-                possibleRange.lowerBound.unwrap().toInt64(),
-                possibleRange.upperBound.unwrap().toInt64()
-            )
+                possibleRange.lowerBound.value.unwrap().toInt64(),
+                possibleRange.upperBound.value.unwrap().toInt64()
+            ).value!!
         )
         q
     }
@@ -57,9 +58,9 @@ class IntDivFunction(
 
     private val possibleRange
         get() = ValueRange(
-            (x.lowerBound / d).floor(),
-            (x.upperBound / d).floor()
-        )
+            (x.lowerBound!!.value.unwrap() / d).floor(),
+            (x.upperBound!!.value.unwrap() / d).floor()
+        ).value!!
 
     private val possibleModUpperBound
         get() = if (d geq Flt64.zero) {
@@ -71,8 +72,8 @@ class IntDivFunction(
     override fun flush(force: Boolean) {
         x.flush(force)
         y.flush(force)
-        q.range.set(ValueRange(possibleRange.lowerBound.unwrap().toInt64(), possibleRange.upperBound.unwrap().toInt64()))
-        r.range.set(ValueRange(Flt64.zero, possibleModUpperBound))
+        q.range.set(ValueRange(possibleRange.lowerBound.value.unwrap().toInt64(), possibleRange.upperBound.value.unwrap().toInt64()).value!!)
+        r.range.set(ValueRange(Flt64.zero, possibleModUpperBound).value!!)
         y.range.set(possibleRange)
     }
 

@@ -6,7 +6,7 @@ import fuookami.ospf.kotlin.core.frontend.expression.*
 
 data class Range<T, V>(
     val type: T,
-    private val constants: RealNumberConstants<V>
+    override val constants: RealNumberConstants<V>
 ) : ExpressionRange<V>(
     _range = ValueRange(
         type.minimum,
@@ -14,7 +14,7 @@ data class Range<T, V>(
         Interval.Closed,
         Interval.Closed,
         constants
-    ),
+    ).value!!,
     constants = constants
 ) where T : VariableType<V>, V : RealNumber<V>, V : NumberField<V>
 

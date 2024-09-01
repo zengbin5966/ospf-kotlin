@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task.model
 
 import kotlin.time.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.framework.gantt_scheduling.infrastructure.*
 
@@ -11,11 +12,12 @@ open class ResourceCapacity(
     val lessQuantity: Flt64? = null,
     val overQuantity: Flt64? = null,
     val interval: Duration = Duration.INFINITE,
+    val name: String? = null
 ) {
     open val lessEnabled: Boolean get() = lessQuantity != null
     open val overEnabled: Boolean get() = overQuantity != null
 
-    override fun toString() = "${quantity}_${interval}"
+    override fun toString() = name ?: "${quantity}_${interval}"
 }
 
 abstract class Resource<out C : ResourceCapacity> : ManualIndexed() {

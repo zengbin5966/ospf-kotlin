@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -60,9 +61,9 @@ sealed class AbstractMaxFunction(
 
     private val possibleRange
         get() = ValueRange(
-            polynomials.minOf { it.lowerBound },
-            polynomials.maxOf { it.upperBound }
-        )
+            polynomials.minOf { it.lowerBound!!.value.unwrap() },
+            polynomials.maxOf { it.upperBound!!.value.unwrap() }
+        ).value!!
     private var m = possibleRange
 
     override fun flush(force: Boolean) {
@@ -153,7 +154,7 @@ sealed class AbstractMaxFunction(
         if (exact) {
             for ((i, polynomial) in polynomials.withIndex()) {
                 when (val result = model.addConstraint(
-                    minmax leq (polynomial + m.upperBound.toFlt64() * (Flt64.one - u[i])),
+                    minmax leq (polynomial + m.upperBound.value.unwrap() * (Flt64.one - u[i])),
                     "${name}_ub_${polynomial.name.ifEmpty { "$i" }}"
                 )) {
                     is Ok -> {}

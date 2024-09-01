@@ -188,18 +188,18 @@ sealed interface MutablePolynomial<Self : MutablePolynomial<Self, M, Cell>, M : 
 internal fun possibleRange(
     monomials: List<Monomial<*, *>>,
     constant: Flt64
-): ValueRange<Flt64> {
+): ValueRange<Flt64>? {
     return if (monomials.isEmpty()) {
         ValueRange(
             constant,
             constant,
             Interval.Closed,
             Interval.Closed
-        )
+        ).value
     } else {
-        var ret = monomials[0].range.range
-        for (i in 1 until monomials.size) {
-            ret += monomials[i].range.range
+        var ret = monomials[0].range.range ?: return null
+        for (i in 1..<monomials.size) {
+            ret += (monomials[i].range.range ?: return null)
         }
         ret += constant
         ret

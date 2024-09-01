@@ -14,7 +14,7 @@ sealed interface Order {
     data object Equal : Order {
         override val value = 0
 
-        override fun ifEqual(comp: () -> Order) = comp()
+        override fun ifEqual(f: () -> Order) = f()
     }
 
     data class Greater(override val value: Int = 1) : Order {

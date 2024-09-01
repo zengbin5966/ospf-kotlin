@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -39,18 +40,18 @@ abstract class AbstractSatisfiedAmountPolynomialFunctionImpl(
 
     protected val possibleRange: ValueRange<Flt64>
         get() {
-            val minAmount = UInt64(polynomials.count { it.lowerBound neq Flt64.zero })
-            val maxAmount = UInt64(polynomials.size - polynomials.count { it.upperBound eq Flt64.zero })
+            val minAmount = UInt64(polynomials.count { it.lowerBound!!.value.unwrap() neq Flt64.zero })
+            val maxAmount = UInt64(polynomials.size - polynomials.count { it.upperBound!!.value.unwrap() eq Flt64.zero })
             return if (amount != null) {
                 if (minAmount geq amount) {
-                    ValueRange(Flt64.one, Flt64.one)
+                    ValueRange(Flt64.one, Flt64.one).value!!
                 } else if (maxAmount ls amount) {
-                    ValueRange(Flt64.zero, Flt64.zero)
+                    ValueRange(Flt64.zero, Flt64.zero).value!!
                 } else {
-                    ValueRange(Flt64.zero, Flt64.one)
+                    ValueRange(Flt64.zero, Flt64.one).value!!
                 }
             } else {
-                ValueRange(minAmount.toFlt64(), maxAmount.toFlt64())
+                ValueRange(minAmount.toFlt64(), maxAmount.toFlt64()).value!!
             }
         }
 

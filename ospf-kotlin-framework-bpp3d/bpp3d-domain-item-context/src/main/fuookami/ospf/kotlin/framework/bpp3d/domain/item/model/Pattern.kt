@@ -151,11 +151,11 @@ sealed class Pattern {
         val leftUpper: NextPointExtractor = { projection, placements ->
             val y = placements.filter { it.y eq Flt64.zero }.maxOf { it.maxY }
             val maxY = max(placements.maxOf { it.maxY }, y + projection.height)
-            val yRange = ValueRange(y, maxY)
+            val yRange = ValueRange(y, maxY).value!!
             var x = Flt64.zero
             for (placement in placements) {
-                val range = ValueRange(placement.y, placement.maxY, Interval.Closed, Interval.Open, Flt64)
-                if (!yRange.intersect(range).empty) {
+                val range = ValueRange(placement.y, placement.maxY, Interval.Closed, Interval.Open, Flt64).value!!
+                if (yRange.intersect(range) != null) {
                     x = max(x, placement.maxX)
                 }
             }

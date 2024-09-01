@@ -170,10 +170,10 @@ sealed interface MetaModel : Model {
             for (token in tokens.tokens.toList().sortedBy { it.solverIndex }) {
                 val range = token.range
                 writer.append("${token.name}, ${token.type}, ")
-                if (range.empty) {
+                if (range == null) {
                     writer.append("empty\n")
                 } else {
-                    writer.append("${range.lowerInterval.lowerSign}${range.lowerBound}, ${range.upperBound}${range.upperInterval.upperSign}\n")
+                    writer.append("${range}\n")
                 }
             }
             writer.append("\n")
@@ -185,7 +185,7 @@ sealed interface MetaModel : Model {
                 if (range.empty) {
                     writer.append("empty")
                 } else {
-                    writer.append("${range.lowerInterval.lowerSign}${range.lowerBound}, ${range.upperBound}${range.upperInterval.upperSign}\n")
+                    writer.append("${range}\n")
                 }
             }
             writer.append("\n")

@@ -153,10 +153,12 @@ sealed class MutableTokenTable(
         }
 
         if (_symbolsMap.containsKey(symbol.name)) {
+            val value = RepeatedSymbolError(_symbolsMap[symbol.name]!!, symbol)
             return Failed(
                 ExErr(
                     code = ErrorCode.SymbolRepetitive,
-                    value = RepeatedSymbolError(_symbolsMap[symbol.name]!!, symbol)
+                    message = value.message,
+                    value = value
                 )
             )
         } else {
@@ -249,6 +251,7 @@ suspend fun Collection<Symbol>.register(tokenTable: MutableTokenTable): Try {
                 dependency.removeAll(readySymbols)
             }
             readySymbols = newReadySymbols
+            jobs.joinAll()
         }
 
         ok

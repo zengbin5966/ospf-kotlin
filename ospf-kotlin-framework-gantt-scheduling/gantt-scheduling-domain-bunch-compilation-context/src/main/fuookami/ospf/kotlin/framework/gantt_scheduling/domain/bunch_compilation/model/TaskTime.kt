@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.bunch_compilation
 
 import kotlin.time.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -169,7 +170,7 @@ open class BunchSchedulingTaskTime<
                                 withPositive = delayEnabled && task.delayEnabled,
                                 name = "est_slack_$task"
                             )
-                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y))
+                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
                             slack
                         }
                     }

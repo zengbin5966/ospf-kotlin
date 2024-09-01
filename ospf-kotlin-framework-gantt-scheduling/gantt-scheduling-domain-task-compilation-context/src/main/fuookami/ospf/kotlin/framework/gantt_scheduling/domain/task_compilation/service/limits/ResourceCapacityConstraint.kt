@@ -30,7 +30,7 @@ class ResourceCapacityConstraint<
                 when (val overQuantity = usage.overQuantity[slot]) {
                     is AbstractSlackFunction<*> -> {
                         when (val result = model.addConstraint(
-                            overQuantity.polyX leq slot.resourceCapacity.quantity.upperBound.toFlt64(),
+                            overQuantity.polyX leq slot.resourceCapacity.quantity.upperBound.value.unwrap(),
                             "${name}_ub_$slot"
                         )) {
                             is Ok -> {}
@@ -43,7 +43,7 @@ class ResourceCapacityConstraint<
 
                     else -> {
                         when (val result = model.addConstraint(
-                            usage.quantity[slot] leq slot.resourceCapacity.quantity.upperBound.toFlt64(),
+                            usage.quantity[slot] leq slot.resourceCapacity.quantity.upperBound.value.unwrap(),
                             "${name}_ub_$slot"
                         )) {
                             is Ok -> {}
@@ -56,7 +56,7 @@ class ResourceCapacityConstraint<
                 }
             } else {
                 when (val result = model.addConstraint(
-                    usage.quantity[slot] leq slot.resourceCapacity.quantity.upperBound.toFlt64(),
+                    usage.quantity[slot] leq slot.resourceCapacity.quantity.upperBound.value.unwrap(),
                     "${usage.name}_${name}_ub_$slot"
                 )) {
                     is Ok -> {}
@@ -71,7 +71,7 @@ class ResourceCapacityConstraint<
                 when (val lessQuantity = usage.lessQuantity[slot]) {
                     is AbstractSlackFunction<*> -> {
                         when (val result = model.addConstraint(
-                            lessQuantity.polyX geq slot.resourceCapacity.quantity.lowerBound.toFlt64(),
+                            lessQuantity.polyX geq slot.resourceCapacity.quantity.lowerBound.value.unwrap(),
                             "${name}_lb_$slot"
                         )) {
                             is Ok -> {}
@@ -84,7 +84,7 @@ class ResourceCapacityConstraint<
 
                     else -> {
                         when (val result = model.addConstraint(
-                            usage.quantity[slot] geq slot.resourceCapacity.quantity.lowerBound.toFlt64(),
+                            usage.quantity[slot] geq slot.resourceCapacity.quantity.lowerBound.value.unwrap(),
                             "${name}_lb_$slot"
                         )) {
                             is Ok -> {}
@@ -97,7 +97,7 @@ class ResourceCapacityConstraint<
                 }
             } else {
                 when (val result = model.addConstraint(
-                    usage.quantity[slot] geq slot.resourceCapacity.quantity.lowerBound.toFlt64(),
+                    usage.quantity[slot] geq slot.resourceCapacity.quantity.lowerBound.value.unwrap(),
                     "${name}_lb_$slot"
                 )) {
                     is Ok -> {}

@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
@@ -62,8 +63,8 @@ class ProductFunction(
     override val cached get() = polyY.cached
 
     private val possibleRange
-        get() = polynomials.fold(ValueRange(Flt64.one, Flt64.one)) { lhs, rhs ->
-            lhs * rhs.range.valueRange
+        get() = polynomials.fold(ValueRange(Flt64.one, Flt64.one).value!!) { lhs, rhs ->
+            (lhs * rhs.range.valueRange!!)!!
         }
 
     override fun flush(force: Boolean) {

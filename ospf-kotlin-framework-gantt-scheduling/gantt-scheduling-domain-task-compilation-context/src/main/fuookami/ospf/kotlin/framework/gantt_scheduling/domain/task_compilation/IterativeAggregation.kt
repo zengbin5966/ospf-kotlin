@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task_compilation
 import kotlin.time.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
@@ -267,7 +268,7 @@ abstract class AbstractIterativeTaskCompilationAggregation<
                     }
                 }
             ) {
-                y[task].range.set(ValueRange(Binary.minimum, Binary.maximum))
+                y[task].range.set(ValueRange(Binary.minimum, Binary.maximum).value!!)
             }
         }
         for (i in UInt64.zero..iteration) {
@@ -275,7 +276,7 @@ abstract class AbstractIterativeTaskCompilationAggregation<
 
             for (task in tasksIteration[i.toInt()]) {
                 if (!removedTasks.contains(task)) {
-                    xi[task].range.set(ValueRange(Binary.minimum, Binary.maximum))
+                    xi[task].range.set(ValueRange(Binary.minimum, Binary.maximum).value!!)
                 }
             }
         }

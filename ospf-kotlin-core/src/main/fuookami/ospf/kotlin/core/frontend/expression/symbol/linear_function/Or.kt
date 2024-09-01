@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -24,7 +25,7 @@ class OrFunction(
 
     private val polyY: AbstractLinearPolynomial<*> by lazy {
         val poly = LinearPolynomial(y, y.name)
-        poly.range.set(ValueRange(Flt64.zero, Flt64.one))
+        poly.range.set(ValueRange(Flt64.zero, Flt64.one).value!!)
         poly
     }
 
@@ -49,17 +50,17 @@ class OrFunction(
 
     private val possibleRange
         get() = ValueRange(
-            if (!polynomials.any { it.lowerBound.toFlt64() eq Flt64.zero }) {
+            if (!polynomials.any { it.lowerBound!!.value.unwrap() eq Flt64.zero }) {
                 Flt64.one
             } else {
                 Flt64.zero
             },
-            if (polynomials.all { it.upperBound.toFlt64() eq Flt64.zero }) {
+            if (polynomials.all { it.upperBound!!.value.unwrap() eq Flt64.zero }) {
                 Flt64.zero
             } else {
                 Flt64.one
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         for (polynomial in polynomials) {
@@ -111,16 +112,16 @@ class OrFunction(
     override fun register(model: AbstractLinearMechanismModel): Try {
         // all polys must be ∈ (R - R-)
         for (polynomial in polynomials) {
-            if (polynomial.lowerBound ls Flt64.zero) {
+            if (polynomial.lowerBound!!.value.unwrap() ls Flt64.zero) {
                 return Failed(Err(ErrorCode.ApplicationFailed, "$name's domain of definition unsatisfied: $polynomial"))
             }
         }
 
         // if any polynomial is not zero, y will be not zero
         for ((i, polynomial) in polynomials.withIndex()) {
-            if (polynomial.upperBound gr Flt64.one) {
+            if (polynomial.upperBound!!.value.unwrap() gr Flt64.one) {
                 when (val result = model.addConstraint(
-                    y geq (polynomial / polynomial.upperBound.toFlt64()),
+                    y geq (polynomial / polynomial.upperBound!!.value.unwrap()),
                     "${name}_lb_${polynomial.name.ifEmpty { "$i" }}"
                 )) {
                     is Ok -> {}

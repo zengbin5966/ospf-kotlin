@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.bunch_compilation
 import kotlin.time.*
 import kotlinx.coroutines.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
 import fuookami.ospf.kotlin.core.frontend.expression.polynomial.*
@@ -38,11 +39,11 @@ class BunchSchedulingExecutionResourceUsage<
                 for (slot in timeSlots) {
                     quantity[slot].range.set(
                         ValueRange(
-                            slot.resourceCapacity.quantity.lowerBound.toFlt64() - (slot.resourceCapacity.lessQuantity
+                            slot.resourceCapacity.quantity.lowerBound.value.unwrap() - (slot.resourceCapacity.lessQuantity
                                 ?: Flt64.zero),
-                            slot.resourceCapacity.quantity.upperBound.toFlt64() + (slot.resourceCapacity.overQuantity
+                            slot.resourceCapacity.quantity.upperBound.value.unwrap() + (slot.resourceCapacity.overQuantity
                                 ?: Flt64.zero)
-                        )
+                        ).value!!
                     )
                 }
             }
@@ -118,11 +119,11 @@ class BunchSchedulingConnectionResourceUsage<
                 for (slot in timeSlots) {
                     quantity[slot].range.set(
                         ValueRange(
-                            slot.resourceCapacity.quantity.lowerBound.toFlt64() - (slot.resourceCapacity.lessQuantity
+                            slot.resourceCapacity.quantity.lowerBound.value.unwrap() - (slot.resourceCapacity.lessQuantity
                                 ?: Flt64.zero),
-                            slot.resourceCapacity.quantity.upperBound.toFlt64() + (slot.resourceCapacity.overQuantity
+                            slot.resourceCapacity.quantity.upperBound.value.unwrap() + (slot.resourceCapacity.overQuantity
                                 ?: Flt64.zero)
-                        )
+                        ).value!!
                     )
                 }
             }

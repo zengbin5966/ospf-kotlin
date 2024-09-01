@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.geometry.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -31,17 +32,17 @@ abstract class AbstractBinaryzationFunctionImpl(
 
     protected val possibleRange
         get() = ValueRange(
-            if (x.lowerBound eq Flt64.zero) {
+            if (x.lowerBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.zero
             } else {
                 UInt8.one
             },
-            if (x.upperBound eq Flt64.zero) {
+            if (x.upperBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.zero
             } else {
                 UInt8.one
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         x.flush(force)
@@ -253,7 +254,7 @@ class BinaryzationFunctionDiscreteImpl(
 
     override fun register(model: AbstractLinearMechanismModel): Try {
         when (val result = model.addConstraint(
-            x.upperBound * y geq x,
+            x.upperBound!!.value.unwrap() * y geq x,
             "${name}_lb"
         )) {
             is Ok -> {}
@@ -310,7 +311,7 @@ class BinaryzationFunctionExtractAndNotDiscreteImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             x.value(tokenTable)?.let { xValue ->
-                val pct = xValue / x.upperBound
+                val pct = xValue / x.upperBound!!.value.unwrap()
                 val bin = xValue gr Flt64.zero
                 val yValue = if (bin) {
                     Flt64.one
@@ -354,7 +355,7 @@ class BinaryzationFunctionExtractAndNotDiscreteImpl(
 
     override fun register(model: AbstractLinearMechanismModel): Try {
         when (val result = model.addConstraint(
-            x eq x.upperBound * b,
+            x eq x.upperBound!!.value.unwrap() * b,
             "${name}_xb"
         )) {
             is Ok -> {}
@@ -404,7 +405,7 @@ class BinaryzationFunction(
     }
 
     private val impl: AbstractBinaryzationFunctionImpl by lazy {
-        impl ?: if (x.discrete && x.range.range in ValueRange(Flt64.zero, Flt64.one)) {
+        impl ?: if (x.discrete && ValueRange(Flt64.zero, Flt64.one).value!! contains x.range.range!!) {
             BinaryzationFunctionImpl(x, this, name, displayName)
         } else if (x.discrete) {
             BinaryzationFunctionDiscreteImpl(x, this, extract, name, displayName)

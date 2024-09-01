@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.math.geometry.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -31,17 +32,17 @@ abstract class AbstractNotFunctionImpl(
 
     protected val possibleRange
         get() = ValueRange(
-            if (x.lowerBound eq Flt64.zero) {
+            if (x.lowerBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.one
             } else {
                 UInt8.zero
             },
-            if (x.upperBound eq Flt64.zero) {
+            if (x.upperBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.one
             } else {
                 UInt8.zero
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         x.flush(force)
@@ -253,7 +254,7 @@ class NotFunctionDiscreteImpl(
 
     override fun register(model: AbstractLinearMechanismModel): Try {
         when (val result = model.addConstraint(
-            x.upperBound * (Flt64.one - y) geq x,
+            x.upperBound!!.value.unwrap() * (Flt64.one - y) geq x,
             "${name}_lb"
         )) {
             is Ok -> {}
@@ -310,7 +311,7 @@ class NotFunctionExtractAndNotDiscreteImpl(
 
         if (tokenTable.cachedSolution && tokenTable.cached(parent) == false) {
             x.value(tokenTable)?.let { xValue ->
-                val pct = xValue / x.upperBound
+                val pct = xValue / x.upperBound!!.value.unwrap()
                 val bin = xValue eq Flt64.zero
                 val yValue = if (bin) {
                     Flt64.one
@@ -354,7 +355,7 @@ class NotFunctionExtractAndNotDiscreteImpl(
 
     override fun register(model: AbstractLinearMechanismModel): Try {
         when (val result = model.addConstraint(
-            x eq x.upperBound * b,
+            x eq x.upperBound!!.value.unwrap() * b,
             "${name}_xb"
         )) {
             is Ok -> {}
@@ -404,7 +405,7 @@ class NotFunction(
     }
 
     private val impl: AbstractNotFunctionImpl by lazy {
-        impl ?: if (x.discrete && x.range.range in ValueRange(Flt64.zero, Flt64.one)) {
+        impl ?: if (x.discrete && ValueRange(Flt64.zero, Flt64.one).value!! contains x.range.range!!) {
             NotFunctionImpl(x, this, name, displayName)
         } else if (x.discrete) {
             NotFunctionDiscreteImpl(x, this, extract, name, displayName)

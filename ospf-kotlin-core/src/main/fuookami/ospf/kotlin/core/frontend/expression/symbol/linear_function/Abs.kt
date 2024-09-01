@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.operator.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -53,7 +54,7 @@ class AbsFunction(
     override val cells get() = y.cells
     override val cached get() = y.cached
 
-    private val possibleUpperBound get() = max(abs(x.lowerBound), abs(x.upperBound))
+    private val possibleUpperBound get() = max(abs(x.lowerBound!!.value.unwrap()), abs(x.upperBound!!.value.unwrap()))
     private var m = possibleUpperBound
 
     override fun flush(force: Boolean) {
@@ -61,7 +62,7 @@ class AbsFunction(
         y.flush(force)
         val newM = possibleUpperBound
         if (m neq newM) {
-            y.range.set(ValueRange(-m, m))
+            y.range.set(ValueRange(-m, m).value!!)
             y.asMutable() *= m / newM
             m = newM
         }
@@ -129,7 +130,7 @@ class AbsFunction(
             }
         }
 
-        y.range.set(ValueRange(Flt64.zero, m))
+        y.range.set(ValueRange(Flt64.zero, m).value!!)
 
         return ok
     }

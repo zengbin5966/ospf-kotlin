@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.geometry.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.operator.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
@@ -92,7 +93,7 @@ sealed class AbstractBivariateLinearPiecewiseFunction(
             ValueRange(
                 triangles.minOf { minOf(it.p1.z, it.p2.z, it.p3.z) },
                 triangles.maxOf { maxOf(it.p1.z, it.p2.z, it.p3.z) }
-            )
+            ).value!!
         )
         polyZ
     }

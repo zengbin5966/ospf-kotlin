@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.geometry.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -76,7 +77,7 @@ sealed class AbstractUnivariateLinearPiecewiseFunction(
             sum(points.mapIndexed { i, p -> p.y * k[i] }),
             "${name}_y"
         )
-        polyY.range.set(ValueRange(points.minOf { it.y }, points.maxOf { it.y }))
+        polyY.range.set(ValueRange(points.minOf { it.y }, points.maxOf { it.y }).value!!)
         polyY
     }
 
@@ -259,15 +260,7 @@ open class MonotoneUnivariateLinearPiecewiseFunction(
 ) : AbstractUnivariateLinearPiecewiseFunction(x, points.sortedBy { it.x }, name, displayName) {
     init {
         assert(points.foldIndexed(true) { index, acc, point ->
-            if (!acc) {
-                acc
-            } else {
-                if (index == 0) {
-                    acc
-                } else {
-                    point.y geq points[index - 1].y
-                }
-            }
+            acc && (index == 0 || point.y geq points[index - 1].y)
         })
     }
 

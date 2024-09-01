@@ -7,8 +7,8 @@ import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 
 open class ExpressionRange<V>(
-    private var _range: ValueRange<V>,
-    private val constants: RealNumberConstants<V>
+    private var _range: ValueRange<V>?,
+    protected open val constants: RealNumberConstants<V>
 ) where V : RealNumber<V>, V : NumberField<V> {
     companion object {
         @Suppress("UNCHECKED_CAST")
@@ -35,44 +35,24 @@ open class ExpressionRange<V>(
                     Interval.Closed,
                     Interval.Closed,
                     constants
-                ),
+                ).value!!,
                 constants = constants
             )
         }
     }
 
     val range by ::_range
-    val valueRange: ValueRange<Flt64>
-        get() = ValueRange(
-            range.lowerBound.toFlt64(),
-            range.upperBound.toFlt64(),
-            range.lowerInterval,
-            range.upperInterval
-        )
+    val valueRange get() = range?.toFlt64()
 
-    val lowerBound: ValueWrapper<V>?
-        get() = if (empty) {
-            null
-        } else {
-            range.lowerBound
-        }
+    val lowerBound get() = range?.lowerBound
+    val upperBound get() = range?.upperBound
 
-    val upperBound: ValueWrapper<V>?
-        get() = if (empty) {
-            null
-        } else {
-            range.upperBound
-        }
+    val empty get() = range == null
+    val fixed get() = range?.fixed == true
+    val fixedValue get() = range?.fixedValue
 
-    val lowerInterval by range::lowerInterval
-    val upperInterval by range::upperInterval
-
-    val empty by range::empty
-    val fixed by range::fixed
-    val fixedValue by range::fixedValue
-
-    private var _set: Boolean = false
-    internal val set: Boolean = true
+    private var _set = false
+    internal val set get() = _set
 
     fun set(range: ValueRange<V>) {
         _set = true
@@ -81,24 +61,18 @@ open class ExpressionRange<V>(
 
     fun intersectWith(range: ValueRange<V>): Boolean {
         _set = true
-        _range = _range.intersect(range)
-        return !_range.empty
+        _range = _range?.intersect(range)
+        return _range != null
     }
 
     infix fun ls(value: Invariant<V>): Boolean {
-        return if (range.empty) {
-            false
-        } else {
-            intersectWith(
-                ValueRange(
-                    lowerBound!!,
-                    ValueWrapper.Value(value.value(), constants),
-                    Interval.Closed,
-                    Interval.Closed,
-                    constants
-                )
-            )
-        }
+        return intersectWith(
+            ValueRange.leq(
+                value.value(),
+                Interval.Closed,
+                constants
+            ).value!!
+        )
     }
 
     infix fun leq(value: Invariant<V>): Boolean {
@@ -106,19 +80,13 @@ open class ExpressionRange<V>(
     }
 
     infix fun gr(value: Invariant<V>): Boolean {
-        return if (range.empty) {
-            false
-        } else {
-            intersectWith(
-                ValueRange(
-                    ValueWrapper.Value(value.value(), constants),
-                    upperBound!!,
-                    Interval.Closed,
-                    Interval.Closed,
-                    constants
-                )
-            )
-        }
+        return intersectWith(
+            ValueRange.geq(
+                value.value(),
+                Interval.Closed,
+                constants
+            ).value!!
+        )
     }
 
     infix fun geq(value: Invariant<V>): Boolean {
@@ -126,35 +94,24 @@ open class ExpressionRange<V>(
     }
 
     infix fun eq(value: Invariant<V>): Boolean {
-        return if (range.empty) {
-            false
-        } else {
-            intersectWith(
-                ValueRange(
-                    ValueWrapper.Value(value.value(), constants),
-                    ValueWrapper.Value(value.value(), constants),
-                    Interval.Closed,
-                    Interval.Closed,
-                    constants
-                )
-            )
-        }
+        return intersectWith(
+            ValueRange(
+                value.value(),
+                constants
+            ).value!!
+        )
     }
 
     fun intersectWith(lb: Invariant<V>, ub: Invariant<V>): Boolean {
-        return if (range.empty) {
-            false
-        } else {
-            intersectWith(
-                ValueRange(
-                    ValueWrapper.Value(lb.value(), constants),
-                    ValueWrapper.Value(ub.value(), constants),
-                    Interval.Closed,
-                    Interval.Closed,
-                    constants
-                )
-            )
-        }
+        return intersectWith(
+            ValueRange(
+                lb.value(),
+                ub.value(),
+                Interval.Closed,
+                Interval.Closed,
+                constants
+            ).value!!
+        )
     }
 }
 
@@ -168,8 +125,8 @@ interface Expression {
     val discrete: Boolean get() = false
 
     val range: ExpressionRange<Flt64>
-    val lowerBound: Flt64 get() = range.lowerBound?.toFlt64() ?: Flt64.minimum
-    val upperBound: Flt64 get() = range.upperBound?.toFlt64() ?: Flt64.maximum
+    val lowerBound get() = range.lowerBound?.toFlt64()
+    val upperBound get() = range.upperBound?.toFlt64()
 
     fun value(tokenList: AbstractTokenList, zeroIfNone: Boolean = false): Flt64?
     fun value(results: List<Flt64>, tokenList: AbstractTokenList, zeroIfNone: Boolean = false): Flt64?

@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -65,7 +66,7 @@ class SameAsFunction(
     private val possibleRange: ValueRange<Flt64>
         get() {
             // todo: impl by Inequality.judge()
-            return ValueRange(Flt64.zero, Flt64.one)
+            return ValueRange(Flt64.zero, Flt64.one).value!!
         }
 
     override fun flush(force: Boolean) {

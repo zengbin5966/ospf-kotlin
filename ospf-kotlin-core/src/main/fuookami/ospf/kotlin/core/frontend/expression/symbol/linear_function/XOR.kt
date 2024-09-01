@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
@@ -80,14 +81,14 @@ class XorFunction(
     private val possibleRange
         get() = ValueRange(
             Flt64.zero,
-            if (polynomials.all { it.upperBound.toFlt64() eq Flt64.zero }
-                || polynomials.all { it.lowerBound.toFlt64() eq Flt64.one }
+            if (polynomials.all { it.upperBound!!.value.unwrap() eq Flt64.zero }
+                || polynomials.all { it.lowerBound!!.value.unwrap() eq Flt64.one }
             ) {
                 Flt64.zero
             } else {
                 Flt64.one
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         if (polynomials.size > 2) {
@@ -147,7 +148,7 @@ class XorFunction(
     override fun register(tokenTable: MutableTokenTable): Try {
         // all polys must be ∈ (R - R-)
         for (polynomial in polynomials) {
-            if (polynomial.lowerBound ls Flt64.zero) {
+            if (polynomial.lowerBound!!.value.unwrap() ls Flt64.zero) {
                 return Failed(Err(ErrorCode.ApplicationFailed, "$name's domain of definition unsatisfied: $polynomial"))
             }
         }

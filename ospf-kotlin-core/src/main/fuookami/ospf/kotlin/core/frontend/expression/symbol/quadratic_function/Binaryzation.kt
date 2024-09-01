@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -31,17 +32,17 @@ abstract class AbstractBinaryzationFunctionImpl(
 
     protected val possibleRange
         get() = ValueRange(
-            if (x.lowerBound eq Flt64.zero) {
+            if (x.lowerBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.zero
             } else {
                 UInt8.one
             },
-            if (x.upperBound eq Flt64.zero) {
+            if (x.upperBound!!.value.unwrap() eq Flt64.zero) {
                 UInt8.zero
             } else {
                 UInt8.one
             }
-        )
+        ).value!!
 
     override fun flush(force: Boolean) {
         x.flush(force)
@@ -208,7 +209,7 @@ class BinaryzationFunctionLinearImpl(
             }
         }
         model.addConstraint(
-            (Flt64.one - y) * linearX leq x.upperBound * y,
+            (Flt64.one - y) * linearX leq x.upperBound!!.value.unwrap() * y,
             "${name}_ub"
         )
         model.addConstraint(
@@ -229,7 +230,7 @@ class BinaryzationFunction(
     private val logger = logger()
 
     private val impl: AbstractBinaryzationFunctionImpl by lazy {
-        impl ?: if (x.discrete && x.range.range in ValueRange(Flt64.zero, Flt64.one)) {
+        impl ?: if (x.discrete && ValueRange(Flt64.zero, Flt64.one).value!! contains x.range.range!!) {
             BinaryzationFunctionImpl(x, this, name, displayName)
         } else {
             BinaryzationFunctionLinearImpl(x, this, epsilon, name, displayName)

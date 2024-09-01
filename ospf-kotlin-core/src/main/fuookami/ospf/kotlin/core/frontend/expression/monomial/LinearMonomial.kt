@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.monomial
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.operator.*
 import fuookami.ospf.kotlin.utils.functional.*
@@ -589,15 +590,13 @@ data class LinearMonomial(
     override val range: ExpressionRange<Flt64>
         get() {
             if (_range == null) {
-                _range = ExpressionRange(
-                    coefficient * ValueRange(
-                        symbol.lowerBound,
-                        symbol.upperBound,
-                        symbol.range.lowerInterval,
-                        symbol.range.upperInterval
-                    ),
-                    Flt64
-                )
+                _range = if (symbol.range.range != null) {
+                    (coefficient * symbol.range.range!!.toFlt64())?.let {
+                        ExpressionRange(it, Flt64)
+                    } ?: ExpressionRange(null, Flt64)
+                } else {
+                    ExpressionRange(null, Flt64)
+                }
             }
             return _range!!
         }

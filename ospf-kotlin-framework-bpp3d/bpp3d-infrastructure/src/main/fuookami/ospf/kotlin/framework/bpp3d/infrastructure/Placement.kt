@@ -52,8 +52,8 @@ data class Placement2<
         } else {
             Interval.Open
         }
-        val xRange = ValueRange(x, maxX, lowerInterval, upperInterval, Flt64)
-        val yRange = ValueRange(y, maxY, lowerInterval, upperInterval, Flt64)
+        val xRange = ValueRange(x, maxX, lowerInterval, upperInterval, Flt64).value!!
+        val yRange = ValueRange(y, maxY, lowerInterval, upperInterval, Flt64).value!!
         return xRange.contains(point.x) && yRange.contains(point.y)
     }
 
@@ -174,9 +174,9 @@ data class Placement3<T : CuboidUnit<T>>(
         } else {
             Interval.Open
         }
-        val xRange = ValueRange(absoluteX, maxAbsoluteX, lowerInterval, upperInterval, Flt64)
-        val yRange = ValueRange(absoluteY, maxAbsoluteY, lowerInterval, upperInterval, Flt64)
-        val zRange = ValueRange(absoluteZ, maxAbsoluteZ, lowerInterval, upperInterval, Flt64)
+        val xRange = ValueRange(absoluteX, maxAbsoluteX, lowerInterval, upperInterval, Flt64).value!!
+        val yRange = ValueRange(absoluteY, maxAbsoluteY, lowerInterval, upperInterval, Flt64).value!!
+        val zRange = ValueRange(absoluteZ, maxAbsoluteZ, lowerInterval, upperInterval, Flt64).value!!
         return xRange.contains(point.x) && yRange.contains(point.y) && zRange.contains(point.z)
     }
 

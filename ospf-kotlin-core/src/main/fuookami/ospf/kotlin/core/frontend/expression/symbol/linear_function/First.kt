@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.linear_function
 
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
@@ -52,8 +53,8 @@ class FirstFunction(
 
     private val possibleRange: ValueRange<Flt64>
         get() {
-            val firstIndex = polynomials.indexOfFirst { it.lowerBound.toFlt64() eq Flt64.one }
-            val lastIndex = polynomials.indexOfLast { it.upperBound.toFlt64() eq Flt64.one }
+            val firstIndex = polynomials.indexOfFirst { it.lowerBound!!.value.unwrap() eq Flt64.one }
+            val lastIndex = polynomials.indexOfLast { it.upperBound!!.value.unwrap() eq Flt64.one }
             return ValueRange(
                 if (firstIndex != -1) {
                     Flt64(firstIndex)
@@ -65,7 +66,7 @@ class FirstFunction(
                 } else {
                     Flt64(polynomials.size)
                 }
-            )
+            ).value!!
         }
 
     override fun flush(force: Boolean) {
@@ -121,7 +122,7 @@ class FirstFunction(
     override fun register(tokenTable: MutableTokenTable): Try {
         // all polys must be ∈ (R - R-)
         for (polynomial in polynomials) {
-            if (polynomial.lowerBound ls Flt64.zero) {
+            if (polynomial.lowerBound!!.value.unwrap() ls Flt64.zero) {
                 return Failed(Err(ErrorCode.ApplicationFailed, "$name's domain of definition unsatisfied: $polynomial"))
             }
         }

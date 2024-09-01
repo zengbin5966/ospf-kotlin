@@ -1,6 +1,7 @@
 package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task_compilation.model
 
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.concept.*
 import fuookami.ospf.kotlin.utils.functional.*
@@ -90,7 +91,7 @@ class TaskCompilation<
             )
             for (task in tasks) {
                 for (executor in executors) {
-                    taskAssignment[task, executor].range.set(ValueRange(Flt64.zero, Flt64.one))
+                    taskAssignment[task, executor].range.set(ValueRange(Flt64.zero, Flt64.one).value!!)
                 }
             }
         }
@@ -138,7 +139,7 @@ class TaskCompilation<
                 { (_, t) -> "$t" }
             )
             for (task in tasks) {
-                taskCompilation[task].range.set(ValueRange(Flt64.one, Flt64.one))
+                taskCompilation[task].range.set(ValueRange(Flt64.one, Flt64.one).value!!)
             }
         }
         when (val result = model.add(taskCompilation)) {

@@ -3,6 +3,7 @@ package fuookami.ospf.kotlin.core.frontend.expression.symbol.quadratic_function
 import org.apache.logging.log4j.kotlin.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
 import fuookami.ospf.kotlin.core.frontend.expression.monomial.*
@@ -27,9 +28,9 @@ class IntDivFunction(
         val q = IntVar("${name}_q")
         q.range.set(
             ValueRange(
-                possibleRange.lowerBound.unwrap().toInt64(),
-                possibleRange.upperBound.unwrap().toInt64()
-            )
+                possibleRange.lowerBound.value.unwrap().toInt64(),
+                possibleRange.upperBound.value.unwrap().toInt64()
+            ).value!!
         )
         q
     }
@@ -48,31 +49,31 @@ class IntDivFunction(
 
     private val possibleRange: ValueRange<Flt64>
         get() {
-            return if (d.range.range.contains(Flt64.zero)) {
+            return if (d.range.range!!.contains(Flt64.zero)) {
                 ValueRange(
-                    (x.upperBound / d.lowerBound).floor(),
+                    (x.upperBound!!.value.unwrap() / d.lowerBound!!.value.unwrap()).floor(),
                     Flt64.maximum
-                )
+                ).value!!
             } else {
-                val q1 = (x.upperBound / d.upperBound).floor()
-                val q2 = (x.upperBound / d.lowerBound).floor()
-                val q3 = (x.lowerBound / d.upperBound).floor()
-                val q4 = (x.lowerBound / d.lowerBound).floor()
-                ValueRange(min(q1, q2, q3, q4), max(q1, q2, q3, q4))
+                val q1 = (x.upperBound!!.value.unwrap() / d.upperBound!!.value.unwrap()).floor()
+                val q2 = (x.upperBound!!.value.unwrap() / d.lowerBound!!.value.unwrap()).floor()
+                val q3 = (x.lowerBound!!.value.unwrap() / d.upperBound!!.value.unwrap()).floor()
+                val q4 = (x.lowerBound!!.value.unwrap() / d.lowerBound!!.value.unwrap()).floor()
+                ValueRange(min(q1, q2, q3, q4), max(q1, q2, q3, q4)).value!!
             }
         }
 
     private val possibleModUpperBound
         get() = max(
-            if (d.upperBound geq Flt64.zero) {
-                d.upperBound.floor()
+            if (d.upperBound!!.value.unwrap() geq Flt64.zero) {
+                d.upperBound!!.value.unwrap().floor()
             } else {
-                d.upperBound.ceil().abs()
+                d.upperBound!!.value.unwrap().ceil().abs()
             },
-            if (d.lowerBound geq Flt64.zero) {
-                d.upperBound.floor()
+            if (d.lowerBound!!.value.unwrap() geq Flt64.zero) {
+                d.upperBound!!.value.unwrap().floor()
             } else {
-                d.lowerBound.ceil().abs()
+                d.lowerBound!!.value.unwrap().ceil().abs()
             }
         )
 
@@ -95,8 +96,8 @@ class IntDivFunction(
         d.flush(force)
         dLinear.flush(force)
         y.flush(force)
-        q.range.set(ValueRange(possibleRange.lowerBound.unwrap().toInt64(), possibleRange.upperBound.unwrap().toInt64()))
-        r.range.set(ValueRange(Flt64.zero, possibleModUpperBound))
+        q.range.set(ValueRange(possibleRange.lowerBound.value.unwrap().toInt64(), possibleRange.upperBound.value.unwrap().toInt64()).value!!)
+        r.range.set(ValueRange(Flt64.zero, possibleModUpperBound).value!!)
         y.range.set(possibleRange)
     }
 

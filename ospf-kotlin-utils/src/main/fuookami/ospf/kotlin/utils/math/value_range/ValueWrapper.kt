@@ -7,9 +7,11 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.*
 import fuookami.ospf.kotlin.utils.concept.*
+import fuookami.ospf.kotlin.utils.error.ErrorCode
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.math.ordinary.*
 import fuookami.ospf.kotlin.utils.operator.*
+import fuookami.ospf.kotlin.utils.functional.*
 
 internal typealias GlobalInfinity = Infinity
 internal typealias GlobalNegativeInfinity = NegativeInfinity
@@ -71,17 +73,22 @@ sealed class ValueWrapper<T>(
     Times<ValueWrapper<T>, ValueWrapper<T>>, Div<ValueWrapper<T>, ValueWrapper<T>>
         where T : RealNumber<T>, T : NumberField<T> {
     companion object {
-        @Throws(IllegalArgumentException::class)
         @Suppress("UNCHECKED_CAST")
         inline operator fun <reified T> invoke(
             value: T
-        ): ValueWrapper<T> where T : RealNumber<T>, T : NumberField<T> {
-            val constants = (T::class.companionObjectInstance!! as RealNumberConstants<T>)
+        ): Ret<ValueWrapper<T>> where T : RealNumber<T>, T : NumberField<T> {
+            return invoke(value, (T::class.companionObjectInstance!! as RealNumberConstants<T>))
+        }
+
+        operator fun <T> invoke(
+            value: T,
+            constants: RealNumberConstants<T>
+        ): Ret<ValueWrapper<T>> where T : RealNumber<T>, T : NumberField<T> {
             return when (value) {
-                constants.infinity -> Infinity(constants)
-                constants.negativeInfinity -> NegativeInfinity(constants)
-                constants.nan -> throw IllegalArgumentException("Illegal argument NaN for value range!!!")
-                else -> Value(value, constants)
+                constants.infinity -> Ok(Infinity(constants))
+                constants.negativeInfinity -> Ok(NegativeInfinity(constants))
+                constants.nan -> Failed(ErrorCode.IllegalArgument, "Illegal argument NaN for value range!!!")
+                else -> Ok(Value(value, constants))
             }
         }
 
@@ -89,7 +96,13 @@ sealed class ValueWrapper<T>(
         inline operator fun <reified T> invoke(
             _inf: GlobalInfinity
         ): ValueWrapper<T> where T : RealNumber<T>, T : NumberField<T> {
-            val constants = (T::class.companionObjectInstance!! as RealNumberConstants<T>)
+            return Infinity((T::class.companionObjectInstance!! as RealNumberConstants<T>))
+        }
+
+        operator fun <T> invoke(
+            _inf: GlobalInfinity,
+            constants: RealNumberConstants<T>
+        ): ValueWrapper<T> where T : RealNumber<T>, T : NumberField<T> {
             return Infinity(constants)
         }
 
@@ -97,7 +110,13 @@ sealed class ValueWrapper<T>(
         inline operator fun <reified T> invoke(
             _negInf: GlobalNegativeInfinity
         ): ValueWrapper<T> where T : RealNumber<T>, T : NumberField<T> {
-            val constants = (T::class.companionObjectInstance!! as RealNumberConstants<T>)
+            return NegativeInfinity((T::class.companionObjectInstance!! as RealNumberConstants<T>))
+        }
+
+        operator fun <T> invoke(
+            _negInf: GlobalNegativeInfinity,
+            constants: RealNumberConstants<T>
+        ): ValueWrapper<T> where T : RealNumber<T>, T : NumberField<T> {
             return NegativeInfinity(constants)
         }
     }
@@ -114,7 +133,19 @@ sealed class ValueWrapper<T>(
     abstract fun toFlt64(): Flt64
 
     fun unwrap(): T {
-        return (this as Value<T>).value
+        return when (this) {
+            is Value<T> -> {
+                this.value
+            }
+
+            is Infinity<T> -> {
+                constants.infinity!!
+            }
+
+            is NegativeInfinity<T> -> {
+                constants.negativeInfinity!!
+            }
+        }
     }
 
     fun unwrapOrNull(): T? {
@@ -130,6 +161,15 @@ sealed class ValueWrapper<T>(
             is NegativeInfinity<T> -> {
                 constants.negativeInfinity
             }
+        }
+    }
+
+    infix fun eq(rhs: T): Boolean {
+        return when (rhs) {
+            constants.infinity -> this is Infinity
+            constants.negativeInfinity -> this is NegativeInfinity
+            constants.nan -> throw IllegalArgumentException("Illegal argument NaN for value range!!!")
+            else -> (this as? Value<T>)?.value?.eq(rhs) == true
         }
     }
 
@@ -406,4 +446,60 @@ sealed class ValueWrapper<T>(
         override fun toString() = "-inf"
         override fun toFlt64() = Flt64.negativeInfinity
     }
+}
+
+@JvmName("negValueWrapperFlt32")
+operator fun ValueWrapper<Flt32>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperFlt64")
+operator fun ValueWrapper<Flt64>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperFltX")
+operator fun ValueWrapper<FltX>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperInt8")
+operator fun ValueWrapper<Int8>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperInt16")
+operator fun ValueWrapper<Int16>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperInt32")
+operator fun ValueWrapper<Int32>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperInt64")
+operator fun ValueWrapper<Int64>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
+}
+
+@JvmName("negValueWrapperIntX")
+operator fun ValueWrapper<IntX>.unaryMinus() = when (this) {
+    is ValueWrapper.Value -> ValueWrapper.Value(-value, constants)
+    is ValueWrapper.Infinity -> ValueWrapper.NegativeInfinity(constants)
+    is ValueWrapper.NegativeInfinity -> ValueWrapper.Infinity(constants)
 }

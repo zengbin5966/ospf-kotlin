@@ -2,6 +2,8 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task_compilation.
 
 import kotlin.time.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.math.value_range.*
+import fuookami.ospf.kotlin.utils.error.*
 import fuookami.ospf.kotlin.utils.functional.*
 import fuookami.ospf.kotlin.utils.multi_array.*
 import fuookami.ospf.kotlin.core.frontend.variable.*
@@ -13,7 +15,6 @@ import fuookami.ospf.kotlin.core.frontend.inequality.*
 import fuookami.ospf.kotlin.core.frontend.model.mechanism.*
 import fuookami.ospf.kotlin.framework.gantt_scheduling.infrastructure.*
 import fuookami.ospf.kotlin.framework.gantt_scheduling.domain.task.model.*
-import fuookami.ospf.kotlin.utils.error.ApplicationException
 
 interface TaskTime {
     val delayEnabled: Boolean
@@ -813,7 +814,7 @@ class TaskSchedulingTaskTime<
                                     withPositive = delayEnabled && task.delayEnabled,
                                     name = "est_slack_$task"
                                 )
-                                slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y))
+                                slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
                                 slack
                             }
                         }
@@ -1009,7 +1010,7 @@ open class IterativeTaskSchedulingTaskTime<
                                 withPositive = delayEnabled && task.delayEnabled,
                                 name = "est_slack_$task"
                             )
-                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y))
+                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
                             slack
                         }
                     }
