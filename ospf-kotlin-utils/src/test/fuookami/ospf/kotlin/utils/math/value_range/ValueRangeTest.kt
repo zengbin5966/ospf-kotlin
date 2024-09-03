@@ -60,4 +60,39 @@ class ValueRangeTest {
         assert(negHalfRange!!.lowerBound.value.unwrap() eq -Flt64.one)
         assert(negHalfRange.upperBound.value.unwrap() eq -Flt64(0.5))
     }
+
+    @Test
+    fun testIntersection() {
+        val range = ValueRange(Flt64.one, Flt64.three).value!!
+        val leftHalfRange1 = ValueRange(Flt64.zero, Flt64.two).value!! intersect range
+        assert(leftHalfRange1 != null && leftHalfRange1.lowerBound.value.unwrap() eq Flt64.one)
+        assert(leftHalfRange1 != null && leftHalfRange1.upperBound.value.unwrap() eq Flt64.two)
+        val rightHalfRange1 = range intersect ValueRange(Flt64.zero, Flt64.two).value!!
+        assert(rightHalfRange1 != null && rightHalfRange1.lowerBound.value.unwrap() eq Flt64.one)
+        assert(rightHalfRange1 != null && rightHalfRange1.upperBound.value.unwrap() eq Flt64.two)
+        val leftHalfRange2 = ValueRange(Flt64.two, Flt64.ten).value!! intersect range
+        assert(leftHalfRange2 != null && leftHalfRange2.lowerBound.value.unwrap() eq Flt64.two)
+        assert(leftHalfRange2 != null && leftHalfRange2.upperBound.value.unwrap() eq Flt64.three)
+        val rightHalfRange2 = range intersect ValueRange(Flt64.two, Flt64.ten).value!!
+        assert(rightHalfRange2 != null && rightHalfRange2.lowerBound.value.unwrap() eq Flt64.two)
+        assert(rightHalfRange2 != null && rightHalfRange2.upperBound.value.unwrap() eq Flt64.three)
+        val noneRange = range intersect ValueRange(Flt64(4.0), Flt64.ten).value!!
+        assert(noneRange == null)
+    }
+
+    @Test
+    fun testUnion() {
+        val range = ValueRange(Flt64.one, Flt64.three).value!!
+        val unionRange1 = range union ValueRange(Flt64.zero, Flt64.two).value!!
+        assert(unionRange1 != null && unionRange1.lowerBound.value.unwrap() eq Flt64.zero)
+        assert(unionRange1 != null && unionRange1.upperBound.value.unwrap() eq Flt64.three)
+        val unionRange2 = range union ValueRange(Flt64.two, Flt64.ten).value!!
+        assert(unionRange2 != null && unionRange2.lowerBound.value.unwrap() eq Flt64.one)
+        assert(unionRange2 != null && unionRange2.upperBound.value.unwrap() eq Flt64.ten)
+        val unionRange3 = range union ValueRange(Flt64.zero, Flt64.ten).value!!
+        assert(unionRange3 != null && unionRange3.lowerBound.value.unwrap() eq Flt64.zero)
+        assert(unionRange3 != null && unionRange3.upperBound.value.unwrap() eq Flt64.ten)
+        val noneRange = range union ValueRange(Flt64(4.0), Flt64.ten).value!!
+        assert(noneRange == null)
+    }
 }

@@ -2,7 +2,7 @@ package fuookami.ospf.kotlin.framework.gantt_scheduling.infrastructure
 
 import kotlin.math.*
 import kotlin.time.*
-import kotlinx.datetime.Instant
+import kotlinx.datetime.*
 import fuookami.ospf.kotlin.utils.math.*
 import fuookami.ospf.kotlin.utils.functional.*
 
@@ -51,6 +51,8 @@ open class WorkingCalendar(
 
 open class Productivity<T>(
     val timeWindow: TimeRange,
+    val weekDays: Set<DayOfWeek> = emptySet(),
+    val monthDays: Set<Int> = emptySet(),
     val capacities: Map<T, Duration>
 ) {
     open fun capacityOf(material: T): Duration? {
@@ -59,10 +61,14 @@ open class Productivity<T>(
 
     open fun new(
         timeWindow: TimeRange? = null,
+        weekDays: Set<DayOfWeek>? = null,
+        monthDays: Set<Int>? = null,
         capacities: Map<T, Duration>? = null
     ): Productivity<T> {
         return Productivity(
             timeWindow = timeWindow ?: this.timeWindow,
+            weekDays = weekDays ?: this.weekDays,
+            monthDays = monthDays ?: this.monthDays,
             capacities = capacities ?: this.capacities
         )
     }
@@ -229,6 +235,7 @@ sealed class ProductivityCalendar<Q, P, T>(
         var currentTime = max(startTime, productivityCalendar.first().timeWindow.start)
         var restQuantity = quantity
         for (calendar in productivityCalendar) {
+            // todo: calculate with dayOfWeek and dayOfMonth appointment
             currentTime = max(
                 currentTime,
                 calendar.timeWindow.start + connectionTime
@@ -269,6 +276,7 @@ sealed class ProductivityCalendar<Q, P, T>(
         var currentTime = min(endTime, productivityCalendar.first().timeWindow.end)
         var restAmount = quantity
         for (calendar in productivityCalendar) {
+            // todo: calculate with dayOfWeek and dayOfMonth appointment
             currentTime = min(
                 currentTime,
                 calendar.timeWindow.end
@@ -307,8 +315,8 @@ sealed class ProductivityCalendar<Q, P, T>(
     ): Q {
         var quantity = constants.zero
         for (calendar in productivityCalendar) {
-            val intersection = time.intersectionWith(calendar.timeWindow)
-                ?: continue
+            // todo: calculate with dayOfWeek and dayOfMonth appointment
+            val intersection = time.intersectionWith(calendar.timeWindow) ?: continue
             val produceTime = timeWindow.valueOf(
                 if (intersection.start == calendar.timeWindow.start) {
                     intersection.duration - connectionTime

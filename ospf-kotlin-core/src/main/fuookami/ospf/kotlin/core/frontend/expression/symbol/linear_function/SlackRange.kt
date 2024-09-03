@@ -69,8 +69,15 @@ sealed class AbstractSlackRangeFunction<V : Variable<*>>(
 
     private val possibleRange: ValueRange<Flt64>
         get() {
-            val max = max(x.upperBound!!.value.unwrap() - ub.lowerBound!!.value.unwrap(), lb.upperBound!!.value.unwrap() - x.lowerBound!!.value.unwrap())
-            return ValueRange(Flt64.zero, max).value!!
+            val max = max(
+                x.upperBound!!.value.unwrap() - ub.lowerBound!!.value.unwrap(),
+                lb.upperBound!!.value.unwrap() - x.lowerBound!!.value.unwrap()
+            )
+            return if (max leq Flt64.zero) {
+                ValueRange(Flt64.zero, Flt64.zero).value!!
+            } else {
+                ValueRange(Flt64.zero, max).value!!
+            }
         }
 
     override fun flush(force: Boolean) {

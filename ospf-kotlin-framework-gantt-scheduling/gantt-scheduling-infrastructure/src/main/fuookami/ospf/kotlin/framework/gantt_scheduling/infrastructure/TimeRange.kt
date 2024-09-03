@@ -191,7 +191,7 @@ inline fun <T> List<T>.findImpl(
         } else {
             var step = this@findImpl.size / 2
             var i = this@findImpl.size / 2
-            while (i < this@findImpl.size) {
+            while (step != 0 && i < this@findImpl.size) {
                 if (extractor(this@findImpl[i]).contains(time.start)) {
                     break
                 } else if (time.start < extractor(this@findImpl[i]).start) {
@@ -212,7 +212,7 @@ inline fun <T> List<T>.findImpl(
         } else {
             var step = this@findImpl.size / 2
             var i = this@findImpl.size / 2
-            while (i < this@findImpl.size) {
+            while (step != 0 && i < this@findImpl.size) {
                 if (extractor(this@findImpl[i]).contains(time.end)) {
                     ++i
                     break

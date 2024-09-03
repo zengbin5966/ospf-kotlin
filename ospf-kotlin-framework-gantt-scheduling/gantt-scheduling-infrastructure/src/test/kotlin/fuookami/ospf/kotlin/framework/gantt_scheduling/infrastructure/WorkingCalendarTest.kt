@@ -69,14 +69,14 @@ class WorkingCalendarTest {
                         start = Instant.parse("2020-08-30T08:00:00Z"),
                         end = Instant.parse("2020-08-30T18:00:00Z")
                     ),
-                    mapOf(Pair(1, 1.minutes))
+                    capacities = mapOf(Pair(1, 1.minutes))
                 ),
                 Productivity(
                     timeWindow = TimeRange(
                         start = Instant.parse("2020-08-31T08:00:00Z"),
                         end = Instant.parse("2020-08-31T18:00:00Z")
                     ),
-                    mapOf(Pair(1, 0.5.minutes))
+                    capacities = mapOf(Pair(1, 0.5.minutes))
                 )
             )
         )

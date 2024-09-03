@@ -297,10 +297,36 @@ data class ValueRange<T>(
         }
     }
 
-    infix fun intersect(rhs: ValueRange<T>): ValueRange<T>? {
+    infix fun union(rhs: ValueRange<T>): ValueRange<T>? {
+        if (upperBound.value ls rhs.lowerBound.value || rhs.upperBound.value ls lowerBound.value) {
+            return null
+        }
+
         val newLb = when (lowerBound.value ord rhs.lowerBound.value) {
             is Order.Less -> lowerBound.value
             else -> rhs.lowerBound.value
+        }
+        val newLbInterval = lowerBound.interval union rhs.lowerBound.interval
+        val newUb = when (upperBound.value ord rhs.upperBound.value) {
+            is Order.Less -> rhs.upperBound.value
+            else -> upperBound.value
+        }
+        val newUbInterval = upperBound.interval union rhs.upperBound.interval
+        return when (val result = ValueRange(newLb, newUb, newLbInterval, newUbInterval, constants)) {
+            is Ok -> {
+                result.value
+            }
+
+            is Failed -> {
+                null
+            }
+        }
+    }
+
+    infix fun intersect(rhs: ValueRange<T>): ValueRange<T>? {
+        val newLb = when (lowerBound.value ord rhs.lowerBound.value) {
+            is Order.Less -> rhs.lowerBound.value
+            else -> lowerBound.value
         }
         val newLbInterval = lowerBound.interval intersect rhs.lowerBound.interval
         val newUb = when (upperBound.value ord rhs.upperBound.value) {
