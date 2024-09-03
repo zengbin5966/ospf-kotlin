@@ -36,7 +36,7 @@ class TaskOverMaxDelayTimeMinimization<
             val cost = MutableLinearPolynomial()
             for (task in tasks) {
                 val overMaxDelayTime = taskTime.overMaxDelayTime[task]
-                val thisThreshold = threshold(task)?.let { timeWindow.valueOf(it) } ?: Flt64.zero
+                val thisThreshold = threshold(task)?.let { with(timeWindow) { it.value } } ?: Flt64.zero
                 val thisCoefficient = coefficient(task) ?: Flt64.infinity
                 if (thisThreshold eq Flt64.zero) {
                     cost += thisCoefficient * overMaxDelayTime

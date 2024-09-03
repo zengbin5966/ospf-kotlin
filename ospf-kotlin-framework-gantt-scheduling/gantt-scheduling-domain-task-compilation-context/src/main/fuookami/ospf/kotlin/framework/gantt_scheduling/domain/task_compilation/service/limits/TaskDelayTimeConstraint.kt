@@ -37,7 +37,7 @@ class TaskDelayTimeConstraint<
     override fun invoke(model: AbstractLinearMetaModel): Try {
         for (task in tasks) {
             when (val result = model.addConstraint(
-                taskTime.estimateStartTime[task] leq timeWindow.valueOf(task.scheduledTime!!.start),
+                taskTime.estimateStartTime[task] leq with(timeWindow) { task.scheduledTime!!.start.value },
                 "${name}_$task"
             )) {
                 is Ok -> {}

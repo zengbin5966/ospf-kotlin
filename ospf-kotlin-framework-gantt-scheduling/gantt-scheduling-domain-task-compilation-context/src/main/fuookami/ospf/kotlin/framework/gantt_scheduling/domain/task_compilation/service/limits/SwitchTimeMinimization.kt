@@ -30,7 +30,7 @@ class SwitchTimeMinimization<
         for (task1 in tasks) {
             for (task2 in tasks) {
                 val switchTime = switch.switchTime[task1, task2]
-                val thisThreshold = threshold(Pair(task1, task2))?.let { timeWindow.valueOf(it) } ?: Flt64.zero
+                val thisThreshold = threshold(Pair(task1, task2))?.let { with(timeWindow) { it.value } } ?: Flt64.zero
                 val thisCoefficient = coefficient(Pair(task1, task2)) ?: Flt64.infinity
                 if (thisThreshold eq Flt64.zero) {
                     cost += thisCoefficient * switchTime

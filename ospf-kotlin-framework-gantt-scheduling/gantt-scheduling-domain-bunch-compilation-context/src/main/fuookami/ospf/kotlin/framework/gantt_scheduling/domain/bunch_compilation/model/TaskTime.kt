@@ -46,7 +46,7 @@ open class BunchSchedulingTaskTime<
         if (withRedundancy) {
             if (!::estRedundancy.isInitialized) {
                 estRedundancy = if (timeWindow.continues) {
-                    val redundancyValue = timeWindow.valueOf(redundancyRange!!)
+                    val redundancyValue = with(timeWindow) { redundancyRange!!.value }
                     val est = RealVariable1("est_redundancy", Shape1(tasks.size))
                     for (task in tasks) {
                         val variable = est[task]
@@ -65,7 +65,7 @@ open class BunchSchedulingTaskTime<
                     }
                     est
                 } else {
-                    val redundancyValue = timeWindow.valueOf(redundancyRange!!).floor().toInt64()
+                    val redundancyValue = with(timeWindow) { redundancyRange!!.value }.floor().toInt64()
                     val est = IntVariable1("est", Shape1(tasks.size))
                     for (task in tasks) {
                         val variable = est[task]
@@ -154,9 +154,9 @@ open class BunchSchedulingTaskTime<
 
                         else -> {
                             val y = if (timeWindow.continues) {
-                                timeWindow.valueOf(time.start)
+                                with(timeWindow) { time.start.value }
                             } else {
-                                timeWindow.valueOf(time.start).floor()
+                                with(timeWindow) { time.start.value }.floor()
                             }
                             val slack = SlackFunction(
                                 if (timeWindow.continues) {
@@ -170,7 +170,7 @@ open class BunchSchedulingTaskTime<
                                 withPositive = delayEnabled && task.delayEnabled,
                                 name = "est_slack_$task"
                             )
-                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
+                            slack.range.set(ValueRange(-y, with(timeWindow) { end.value } - y).value!!)
                             slack
                         }
                     }
@@ -208,8 +208,8 @@ open class BunchSchedulingTaskTime<
                 for (bunch in thisBunches) {
                     val actualTask = bunch.get(task) ?: continue
                     val time = actualTask.time!!
-                    est.asMutable() += timeWindow.valueOf(time.start) * xi[bunch]
-                    eet.asMutable() += timeWindow.valueOf(time.end) * xi[bunch]
+                    est.asMutable() += with(timeWindow) { time.start.value } * xi[bunch]
+                    eet.asMutable() += with(timeWindow) { time.end.value } * xi[bunch]
                 }
             }
         }

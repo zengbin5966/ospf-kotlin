@@ -101,7 +101,7 @@ abstract class TaskTimeImpl<
                     }
                 }
                 for (task in tasks) {
-                    delayTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    delayTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val time = task.time) {
                         null -> {}
 
@@ -109,12 +109,12 @@ abstract class TaskTimeImpl<
                             if (!task.delayEnabled) {
                                 delayTime[task].range.leq(Flt64.zero)
                             } else {
-                                delayTime[task].range.leq(timeWindow.valueOf(timeWindow.end - time.start))
+                                delayTime[task].range.leq(with(timeWindow) { (timeWindow.end - time.start).value })
                             }
                         }
                     }
                     task.maxDelay?.let {
-                        delayTime[task].range.leq(timeWindow.valueOf(it))
+                        delayTime[task].range.leq(with(timeWindow) { it.value })
                     }
                 }
             }
@@ -159,7 +159,7 @@ abstract class TaskTimeImpl<
                     }
                 }
                 for (task in tasks) {
-                    advanceTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    advanceTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val time = task.time) {
                         null -> {}
 
@@ -167,12 +167,12 @@ abstract class TaskTimeImpl<
                             if (!task.advanceEnabled) {
                                 advanceTime[task].range.leq(Flt64.zero)
                             } else {
-                                advanceTime[task].range.leq(timeWindow.valueOf(time.start - timeWindow.start))
+                                advanceTime[task].range.leq(with(timeWindow) { (time.start - timeWindow.start).value })
                             }
                         }
                     }
                     task.maxAdvance?.let {
-                        advanceTime[task].range.leq(timeWindow.valueOf(it))
+                        advanceTime[task].range.leq(with(timeWindow) { it.value })
                     }
                 }
             }
@@ -209,7 +209,7 @@ abstract class TaskTimeImpl<
                                             UInteger
                                         },
                                         x = LinearPolynomial(delayTime[task]),
-                                        y = LinearPolynomial(timeWindow.valueOf(maxDelayTime)),
+                                        y = LinearPolynomial(with(timeWindow) { maxDelayTime.value }),
                                         withNegative = false,
                                         name = "over_max_delay_time_$task"
                                     )
@@ -243,7 +243,7 @@ abstract class TaskTimeImpl<
                     return Failed(e.error)
                 }
                 for (task in tasks) {
-                    overMaxDelayTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    overMaxDelayTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val maxDelayTime = task.maxDelay) {
                         null -> {}
 
@@ -251,7 +251,7 @@ abstract class TaskTimeImpl<
                             if (!task.delayEnabled) {
                                 overMaxDelayTime[task].range.leq(Flt64.zero)
                             } else {
-                                overMaxDelayTime[task].range.leq(timeWindow.valueOf(maxDelayTime))
+                                overMaxDelayTime[task].range.leq(with(timeWindow) { maxDelayTime.value })
                             }
                         }
                     }
@@ -290,7 +290,7 @@ abstract class TaskTimeImpl<
                                             UInteger
                                         },
                                         x = LinearPolynomial(advanceTime[task]),
-                                        y = LinearPolynomial(timeWindow.valueOf(maxAdvanceTime)),
+                                        y = LinearPolynomial(with(timeWindow) { maxAdvanceTime.value }),
                                         withNegative = false,
                                         name = "over_max_advance_time_$task"
                                     )
@@ -324,7 +324,7 @@ abstract class TaskTimeImpl<
                     return Failed(e.error)
                 }
                 for (task in tasks) {
-                    overMaxAdvanceTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    overMaxAdvanceTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val maxAdvanceTime = task.maxAdvance) {
                         null -> {}
 
@@ -332,7 +332,7 @@ abstract class TaskTimeImpl<
                             if (!task.delayEnabled) {
                                 overMaxAdvanceTime[task].range.leq(Flt64.zero)
                             } else {
-                                overMaxAdvanceTime[task].range.leq(timeWindow.valueOf(maxAdvanceTime))
+                                overMaxAdvanceTime[task].range.leq(with(timeWindow) { maxAdvanceTime.value })
                             }
                         }
                     }
@@ -371,7 +371,7 @@ abstract class TaskTimeImpl<
                                             UInteger
                                         },
                                         x = LinearPolynomial(estimateEndTime[task]),
-                                        y = LinearPolynomial(timeWindow.valueOf(lastEndTime)),
+                                        y = LinearPolynomial(with(timeWindow) { lastEndTime.value }),
                                         withNegative = false,
                                         name = "delay_last_end_time_$task"
                                     )
@@ -405,7 +405,7 @@ abstract class TaskTimeImpl<
                     return Failed(e.error)
                 }
                 for (task in tasks) {
-                    delayLastEndTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    delayLastEndTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val lastEndTime = task.lastEndTime) {
                         null -> {}
 
@@ -413,7 +413,7 @@ abstract class TaskTimeImpl<
                             if (!task.delayEnabled) {
                                 delayLastEndTime[task].range.leq(Flt64.zero)
                             } else {
-                                delayLastEndTime[task].range.leq(timeWindow.valueOf(timeWindow.end - lastEndTime))
+                                delayLastEndTime[task].range.leq(with(timeWindow) { (timeWindow.end - lastEndTime).value })
                             }
                         }
                     }
@@ -452,7 +452,7 @@ abstract class TaskTimeImpl<
                                             UInteger
                                         },
                                         x = LinearPolynomial(estimateEndTime[task]),
-                                        y = LinearPolynomial(timeWindow.valueOf(earliestEndTime)),
+                                        y = LinearPolynomial(with(timeWindow) { earliestEndTime.value }),
                                         withPositive = false,
                                         name = "advance_earliest_end_time_$task"
                                     )
@@ -486,7 +486,7 @@ abstract class TaskTimeImpl<
                     return Failed(e.error)
                 }
                 for (task in tasks) {
-                    advanceEarliestEndTime[task].range.leq(timeWindow.valueOf(timeWindow.duration))
+                    advanceEarliestEndTime[task].range.leq(with(timeWindow) { duration.value })
                     when (val earliestStartTime = task.earliestStartTime) {
                         null -> {}
 
@@ -494,7 +494,7 @@ abstract class TaskTimeImpl<
                             if (!task.advanceEnabled) {
                                 advanceEarliestEndTime[task].range.leq(Flt64.zero)
                             } else {
-                                advanceEarliestEndTime[task].range.leq(timeWindow.valueOf(earliestStartTime - timeWindow.start))
+                                advanceEarliestEndTime[task].range.leq(with(timeWindow) { (earliestStartTime - timeWindow.start).value })
                             }
                         }
                     }
@@ -526,7 +526,7 @@ abstract class TaskTimeImpl<
 
                             else -> {
                                 IfFunction(
-                                    estimateEndTime[task] leq timeWindow.valueOf(lastEndTime),
+                                    estimateEndTime[task] leq with(timeWindow) { lastEndTime.value },
                                     "on_last_end_time_${task}"
                                 )
                             }
@@ -560,7 +560,7 @@ abstract class TaskTimeImpl<
 
                             else -> {
                                 IfFunction(
-                                    estimateEndTime[task] geq timeWindow.valueOf(earliestEndTime),
+                                    estimateEndTime[task] geq with(timeWindow) { earliestEndTime.value },
                                     "on_earliest_end_time_${task}"
                                 )
                             }
@@ -622,7 +622,7 @@ abstract class TaskTimeImpl<
 
                             else -> {
                                 IfFunction(
-                                    estimateEndTime[task] geq timeWindow.valueOf(lastEndTime + timeWindow.duration),
+                                    estimateEndTime[task] geq with(timeWindow) { (lastEndTime + timeWindow.duration).value },
                                     "not_on_last_end_time_${task}"
                                 )
                             }
@@ -656,7 +656,7 @@ abstract class TaskTimeImpl<
 
                             else -> {
                                 IfFunction(
-                                    estimateEndTime[task] leq timeWindow.valueOf(earliestEndTime - timeWindow.duration),
+                                    estimateEndTime[task] leq with(timeWindow) { (earliestEndTime - timeWindow.duration).value },
                                     "not_on_earliest_end_time_${task}"
                                 )
                             }
@@ -734,17 +734,17 @@ class TaskSchedulingTaskTime<
                 for (task in tasks) {
                     val variable = est[task]
                     variable.name = "${est.name}_${task}"
-                    variable.range.leq(timeWindow.valueOf(timeWindow.end))
+                    variable.range.leq(with(timeWindow) { end.value })
 
                     when (val time = task.time) {
                         null -> {}
 
                         else -> {
                             if (!advanceEnabled || !task.advanceEnabled) {
-                                variable.range.geq(timeWindow.valueOf(time.start))
+                                variable.range.geq(with(timeWindow) { time.start.value })
                             }
                             if (!delayEnabled || !task.delayEnabled) {
-                                variable.range.leq(timeWindow.valueOf(time.start))
+                                variable.range.leq(with(timeWindow) { time.start.value })
                             }
                         }
                     }
@@ -755,17 +755,17 @@ class TaskSchedulingTaskTime<
                 for (task in tasks) {
                     val variable = est[task]
                     variable.name = "${est.name}_${task}"
-                    variable.range.leq(timeWindow.valueOf(timeWindow.end).floor().toUInt64())
+                    variable.range.leq(with(timeWindow) { end.value }.floor().toUInt64())
 
                     when (val time = task.time) {
                         null -> {}
 
                         else -> {
                             if (!advanceEnabled || !task.advanceEnabled) {
-                                variable.range.geq(timeWindow.valueOf(time.start).floor().toUInt64())
+                                variable.range.geq(with(timeWindow) { time.start.value }.floor().toUInt64())
                             }
                             if (!delayEnabled || !task.delayEnabled) {
-                                variable.range.leq(timeWindow.valueOf(time.start).floor().toUInt64())
+                                variable.range.leq(with(timeWindow) { time.start.value }.floor().toUInt64())
                             }
                         }
                     }
@@ -798,9 +798,9 @@ class TaskSchedulingTaskTime<
 
                             else -> {
                                 val y = if (timeWindow.continues) {
-                                    timeWindow.valueOf(time.start)
+                                    with(timeWindow) { time.start.value }
                                 } else {
-                                    timeWindow.valueOf(time.start).floor()
+                                    with(timeWindow) { time.start.value }.floor()
                                 }
                                 val slack = SlackFunction(
                                     if (timeWindow.continues) {
@@ -814,7 +814,7 @@ class TaskSchedulingTaskTime<
                                     withPositive = delayEnabled && task.delayEnabled,
                                     name = "est_slack_$task"
                                 )
-                                slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
+                                slack.range.set(ValueRange(-y, with(timeWindow) { end.value } - y).value!!)
                                 slack
                             }
                         }
@@ -838,16 +838,16 @@ class TaskSchedulingTaskTime<
                 { (_, t) -> "$t" }
             )
             for (task in tasks) {
-                estimateStartTime[task].range.leq(timeWindow.valueOf(timeWindow.end))
+                estimateStartTime[task].range.leq(with(timeWindow) { end.value })
                 when (val time = task.time) {
                     null -> {}
 
                     else -> {
                         if (!advanceEnabled || !task.advanceEnabled) {
-                            estimateStartTime[task].range.geq(timeWindow.valueOf(time.start))
+                            estimateStartTime[task].range.geq(with(timeWindow) { time.start.value })
                         }
                         if (!delayEnabled || !task.delayEnabled) {
-                            estimateStartTime[task].range.leq(timeWindow.valueOf(time.start))
+                            estimateStartTime[task].range.leq(with(timeWindow) { time.start.value })
                         }
                     }
                 }
@@ -869,13 +869,13 @@ class TaskSchedulingTaskTime<
                 { (_, t) -> "$t" }
             )
             for (task in tasks) {
-                estimateEndTime[task].range.leq(timeWindow.valueOf(timeWindow.end))
+                estimateEndTime[task].range.leq(with(timeWindow) { end.value })
                 when (val lastEndTime = task.lastEndTime) {
                     null -> {}
 
                     else -> {
                         if (!delayLastEndTimeEnabled || !task.delayEnabled) {
-                            estimateEndTime[task].range.leq(timeWindow.valueOf(lastEndTime))
+                            estimateEndTime[task].range.leq(with(timeWindow) { lastEndTime.value })
                         }
                     }
                 }
@@ -884,7 +884,7 @@ class TaskSchedulingTaskTime<
 
                     else -> {
                         if (!advanceEarliestEndTimeEnabled || !task.advanceEnabled) {
-                            estimateEndTime[task].range.geq(timeWindow.valueOf(earliestEndTime))
+                            estimateEndTime[task].range.geq(with(timeWindow) { earliestEndTime.value })
                         }
                     }
                 }
@@ -994,9 +994,9 @@ open class IterativeTaskSchedulingTaskTime<
 
                         else -> {
                             val y = if (timeWindow.continues) {
-                                timeWindow.valueOf(time.start)
+                                with(timeWindow) { time.start.value }
                             } else {
-                                timeWindow.valueOf(time.start).floor()
+                                with(timeWindow) { time.start.value }.floor()
                             }
                             val slack = SlackFunction(
                                 if (timeWindow.continues) {
@@ -1010,7 +1010,7 @@ open class IterativeTaskSchedulingTaskTime<
                                 withPositive = delayEnabled && task.delayEnabled,
                                 name = "est_slack_$task"
                             )
-                            slack.range.set(ValueRange(-y, timeWindow.valueOf(timeWindow.end) - y).value!!)
+                            slack.range.set(ValueRange(-y, with(timeWindow) { end.value } - y).value!!)
                             slack
                         }
                     }
@@ -1047,8 +1047,8 @@ open class IterativeTaskSchedulingTaskTime<
 
                 for (newTask in thisNewTasks) {
                     val time = newTask.time!!
-                    est.asMutable() += timeWindow.valueOf(time.start) * xi[newTask]
-                    eet.asMutable() += timeWindow.valueOf(time.end) * xi[newTask]
+                    est.asMutable() += with(timeWindow) { time.start.value } * xi[newTask]
+                    eet.asMutable() += with(timeWindow) { time.end.value } * xi[newTask]
                 }
             }
         }

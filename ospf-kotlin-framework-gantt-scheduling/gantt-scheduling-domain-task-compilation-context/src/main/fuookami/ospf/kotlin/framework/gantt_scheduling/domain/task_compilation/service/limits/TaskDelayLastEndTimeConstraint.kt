@@ -37,7 +37,7 @@ class TaskDelayLastEndTimeConstraint<
     override operator fun invoke(model: AbstractLinearMetaModel): Try {
         for (task in tasks) {
             when (val result = model.addConstraint(
-                taskTime.estimateEndTime[task] leq timeWindow.valueOf(task.lastEndTime!!),
+                taskTime.estimateEndTime[task] leq with(timeWindow) { task.lastEndTime!!.value },
                 "${name}_$task"
             )) {
                 is Ok -> {}

@@ -32,7 +32,7 @@ class TaskOverMaxDelayTimeConstraint<Args : GanttSchedulingShadowPriceArguments<
     override fun invoke(model: AbstractLinearMetaModel): Try {
         for (task in tasks) {
             when (val result = model.addConstraint(
-                taskTime.delayTime[task] leq timeWindow.valueOf(task.maxDelay!!),
+                taskTime.delayTime[task] leq with(timeWindow) { task.maxDelay!!.value },
                 "${name}_$task"
             )) {
                 is Ok -> {}

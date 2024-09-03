@@ -37,7 +37,7 @@ class TaskAdvanceEarliestEndTimeConstraint<
     override fun invoke(model: AbstractLinearMetaModel): Try {
         for (task in tasks) {
             when (val result = model.addConstraint(
-                taskTime.estimateEndTime[task] geq timeWindow.valueOf(task.earliestEndTime!!),
+                taskTime.estimateEndTime[task] geq with(timeWindow) { task.earliestEndTime!!.value },
                 "${name}_$task"
             )) {
                 is Ok -> {}

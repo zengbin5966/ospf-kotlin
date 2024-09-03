@@ -37,7 +37,7 @@ class TaskOverMaxAdvanceTimeConstraint<
     override fun invoke(model: AbstractLinearMetaModel): Try {
         for (task in tasks) {
             when (val result = model.addConstraint(
-                taskTime.advanceTime[task] leq timeWindow.valueOf(task.maxAdvance!!),
+                taskTime.advanceTime[task] leq with(timeWindow) { task.maxAdvance!!.value },
                 "${name}_$task"
             )) {
                 is Ok -> {}

@@ -82,12 +82,12 @@ data object SolutionAnalyzer {
         for (token in model.tokens.tokens) {
             if (token.belongsTo(taskTime.est)) {
                 val task = token.variable.vectorView[0]
-                assignedEST[tasks.find { it.index == task }!!] = timeWindow.instantOf(token.result!!)
+                assignedEST[tasks.find { it.index == task }!!] = with(timeWindow) { token.result!!.instant }
             }
         }
 
         val assignedECT = tasks.associateWith { task ->
-            taskTime.estimateEndTime[task].value(results, model.tokens)?.let { timeWindow.instantOf(it) }
+            taskTime.estimateEndTime[task].value(results, model.tokens)?.let { with(timeWindow) { it.instant } }
                 ?: Instant.DISTANT_FUTURE
         }
 

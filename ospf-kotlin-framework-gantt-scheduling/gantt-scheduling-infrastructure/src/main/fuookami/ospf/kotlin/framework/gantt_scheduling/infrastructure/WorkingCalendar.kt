@@ -241,12 +241,12 @@ sealed class ProductivityCalendar<Q, P, T>(
                 calendar.timeWindow.start + connectionTime
             )
             val currentProductivity = calendar.capacityOf(material)
-                ?.let { Flt64.one / timeWindow.valueOf(it) }
+                ?.let { Flt64.one / with(timeWindow) { it.value } }
                 ?: Flt64.zero
-            val maxProduceTime = timeWindow.valueOf(calendar.timeWindow.end - currentTime)
+            val maxProduceTime = with(timeWindow) { (calendar.timeWindow.end - currentTime).value }
             val maxProduceQuantity = floor(maxProduceTime * currentProductivity)
             if (maxProduceQuantity >= restQuantity) {
-                val thisProduceTime = timeWindow.durationOf(restQuantity.toFlt64() / currentProductivity)
+                val thisProduceTime = with(timeWindow) { (restQuantity.toFlt64() / currentProductivity).duration }
                 currentTime += thisProduceTime
                 restQuantity = constants.zero
                 break
@@ -282,12 +282,12 @@ sealed class ProductivityCalendar<Q, P, T>(
                 calendar.timeWindow.end
             )
             val currentProductivity = calendar.capacityOf(material)
-                ?.let { Flt64.one / timeWindow.valueOf(it) }
+                ?.let { Flt64.one / with(timeWindow) { it.value } }
                 ?: Flt64.zero
-            val maxProduceTime = timeWindow.valueOf(currentTime - calendar.timeWindow.start - connectionTime)
+            val maxProduceTime = with(timeWindow) { (currentTime - calendar.timeWindow.start - connectionTime).value }
             val maxProduceAmount = floor(maxProduceTime * currentProductivity)
             if (maxProduceAmount >= restAmount) {
-                val thisProduceTime = timeWindow.durationOf(restAmount.toFlt64() / currentProductivity)
+                val thisProduceTime = with(timeWindow) { (restAmount.toFlt64() / currentProductivity).duration }
                 currentTime -= thisProduceTime
                 restAmount = constants.zero
                 break
@@ -317,15 +317,15 @@ sealed class ProductivityCalendar<Q, P, T>(
         for (calendar in productivityCalendar) {
             // todo: calculate with dayOfWeek and dayOfMonth appointment
             val intersection = time.intersectionWith(calendar.timeWindow) ?: continue
-            val produceTime = timeWindow.valueOf(
+            val produceTime = with(timeWindow) {
                 if (intersection.start == calendar.timeWindow.start) {
                     intersection.duration - connectionTime
                 } else {
                     intersection.duration
-                }
-            )
+                }.value
+            }
             val currentProductivity = calendar.capacityOf(material)
-                ?.let { Flt64.one / timeWindow.valueOf(it) }
+                ?.let { Flt64.one / with(timeWindow) { it.value } }
                 ?: Flt64.zero
             quantity += floor(produceTime * currentProductivity)
         }

@@ -24,7 +24,7 @@ class MakespanMinimization<
     override val name: String = "makespan_minimization"
 ) : AbstractGanttSchedulingCGPipeline<Args, E, A> {
     override operator fun invoke(model: AbstractLinearMetaModel): Try {
-        val thresholdValue = timeWindow.valueOf(threshold)
+        val thresholdValue = with(timeWindow) { threshold.value }
         if (thresholdValue eq Flt64.zero) {
             when (val result = model.minimize(coefficient * makespan.makespan, "makespan")) {
                 is Ok -> {}
