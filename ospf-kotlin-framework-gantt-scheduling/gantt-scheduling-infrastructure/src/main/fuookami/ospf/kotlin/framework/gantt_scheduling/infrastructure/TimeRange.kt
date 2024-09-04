@@ -1,5 +1,6 @@
 package fuookami.ospf.kotlin.framework.gantt_scheduling.infrastructure
 
+import kotlin.math.min
 import kotlin.time.*
 import kotlin.reflect.*
 import kotlinx.datetime.*
@@ -186,33 +187,48 @@ inline fun <T> List<T>.findImpl(
             null
         }
     } else {
-        val lowerBound = if (time.start == Instant.DISTANT_PAST) {
+        val lowerBound = if (time.start <= extractor(this@findImpl.first()).start) {
             0
+        } else if (time.start >= extractor(this@findImpl.last()).end) {
+            this@findImpl.size
         } else {
             var step = this@findImpl.size / 2
-            var i = this@findImpl.size / 2
-            while (step != 0 && i < this@findImpl.size) {
+            var i = if (this@findImpl.size % 2 == 0) {
+                this@findImpl.size / 2 - 1
+            } else {
+                this@findImpl.size / 2
+            }
+            while (i < this@findImpl.size) {
                 if (extractor(this@findImpl[i]).contains(time.start)) {
                     break
                 } else if (time.start < extractor(this@findImpl[i]).start) {
                     if (i == 0 || extractor(this@findImpl[i - 1]).end <= time.start) {
                         break
                     } else {
-                        i -= step
+                        i -= min(i, step)
                     }
                 } else {
                     i += step
+                }
+                if (step == 0) {
+                    break
                 }
                 step /= 2
             }
             i
         }
-        val upperBound = if (time.end == Instant.DISTANT_FUTURE) {
+        val upperBound = if (time.end <= extractor(this@findImpl.first()).start) {
+            0
+        } else if (time.end >= extractor(this@findImpl.last()).end) {
             this@findImpl.size
         } else {
             var step = this@findImpl.size / 2
-            var i = this@findImpl.size / 2
-            while (step != 0 && i < this@findImpl.size) {
+            var i = if (this@findImpl.size % 2 == 0) {
+                this@findImpl.size / 2 - 1
+            } else {
+                this@findImpl.size / 2
+            }
+            while (i < this@findImpl.size) {
                 if (extractor(this@findImpl[i]).contains(time.end)) {
                     ++i
                     break
@@ -220,16 +236,18 @@ inline fun <T> List<T>.findImpl(
                     if (i == 0 || extractor(this@findImpl[i - 1]).start < time.end) {
                         break
                     } else {
-                        i -= step
+                        i -= min(i, step)
                     }
                 } else {
                     i += step
+                }
+                if (step == 0) {
+                    break
                 }
                 step /= 2
             }
             i
         }
-
         Pair(lowerBound, upperBound)
     }
 }
@@ -248,14 +266,22 @@ suspend inline fun <T> List<T>.findParallellyImpl(
         }
     } else {
         coroutineScope {
-            val lowerBoundPromise = if (time.start == Instant.DISTANT_PAST) {
+            val lowerBoundPromise = if (time.start <= extractor(this@findParallellyImpl.first()).start) {
                 async(Dispatchers.Default) {
                     0
+                }
+            } else if (time.start >= extractor(this@findParallellyImpl.last()).end) {
+                async(Dispatchers.Default) {
+                    this@findParallellyImpl.size
                 }
             } else {
                 async(Dispatchers.Default) {
                     var step = this@findParallellyImpl.size / 2
-                    var i = this@findParallellyImpl.size / 2
+                    var i = if (this@findParallellyImpl.size % 2 == 0) {
+                        this@findParallellyImpl.size / 2 - 1
+                    } else {
+                        this@findParallellyImpl.size / 2
+                    }
                     while (i < this@findParallellyImpl.size) {
                         if (extractor(this@findParallellyImpl[i]).contains(time.start)) {
                             break
@@ -263,7 +289,7 @@ suspend inline fun <T> List<T>.findParallellyImpl(
                             if (i == 0 || extractor(this@findParallellyImpl[i - 1]).end <= time.start) {
                                 break
                             } else {
-                                i -= step
+                                i -= min(i, step)
                             }
                         } else {
                             i += step
@@ -273,14 +299,22 @@ suspend inline fun <T> List<T>.findParallellyImpl(
                     i
                 }
             }
-            val upperBoundPromise = if (time.end == Instant.DISTANT_FUTURE) {
+            val upperBoundPromise = if (time.end >= extractor(this@findParallellyImpl.last()).end) {
                 async(Dispatchers.Default) {
                     this@findParallellyImpl.size
+                }
+            } else if (time.end <= extractor(this@findParallellyImpl.first()).start) {
+                async(Dispatchers.Default) {
+                    0
                 }
             } else {
                 async(Dispatchers.Default) {
                     var step = this@findParallellyImpl.size / 2
-                    var i = this@findParallellyImpl.size / 2
+                    var i = if (this@findParallellyImpl.size % 2 == 0) {
+                        this@findParallellyImpl.size / 2 - 1
+                    } else {
+                        this@findParallellyImpl.size / 2
+                    }
                     while (i < this@findParallellyImpl.size) {
                         if (extractor(this@findParallellyImpl[i]).contains(time.end)) {
                             ++i
@@ -289,17 +323,16 @@ suspend inline fun <T> List<T>.findParallellyImpl(
                             if (i == 0 || extractor(this@findParallellyImpl[i - 1]).start < time.end) {
                                 break
                             } else {
-                                i -= step
+                                i -= min(i, step)
                             }
                         } else {
                             i += step
                         }
                         step /= 2
                     }
-                    i
+                    i + 1
                 }
             }
-
             Pair(lowerBoundPromise.await(), upperBoundPromise.await())
         }
     }
