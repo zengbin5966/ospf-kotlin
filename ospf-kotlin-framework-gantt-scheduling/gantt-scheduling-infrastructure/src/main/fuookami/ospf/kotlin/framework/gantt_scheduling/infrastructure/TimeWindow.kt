@@ -167,6 +167,27 @@ data class TimeWindow(
         timeSlots
     }
 
+    val roundTimeSlots: List<TimeRange> by lazy {
+        val timeSlots = ArrayList<TimeRange>()
+        var current = this.start.toJavaInstant().truncatedTo(durationUnit.toTimeUnit().toChronoUnit()).toKotlinInstant()
+        val end = this.end.toJavaInstant().truncatedTo(durationUnit.toTimeUnit().toChronoUnit()).toKotlinInstant().let {
+            if (it != this.end) {
+                it + 1.toDuration(durationUnit)
+            } else {
+                it
+            }
+        }
+        while (current != end) {
+            val duration = min(end - current, interval)
+            timeSlots.add(TimeRange(
+                start = current,
+                end = current + duration
+            ))
+            current += duration
+        }
+        timeSlots
+    }
+
     fun withIntersection(ano: TimeRange): Boolean {
         return window.withIntersection(ano)
     }
