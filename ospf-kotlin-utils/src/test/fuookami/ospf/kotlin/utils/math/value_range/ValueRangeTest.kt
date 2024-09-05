@@ -2,6 +2,7 @@ package fuookami.ospf.kotlin.utils.math.value_range
 
 import org.junit.jupiter.api.*
 import fuookami.ospf.kotlin.utils.math.*
+import fuookami.ospf.kotlin.utils.operator.*
 
 class ValueRangeTest {
     @Test
@@ -23,6 +24,26 @@ class ValueRangeTest {
         val twiceRange = range + range
         assert(twiceRange.lowerBound.value.unwrap() eq Flt64.two)
         assert(twiceRange.upperBound.value.unwrap() eq Flt64(4.0))
+        val infRange = range + Flt64.infinity
+        assert(infRange.lowerBound.value is ValueWrapper.Infinity)
+        assert(infRange.lowerBound.interval == Interval.Open)
+        assert(infRange.upperBound.value is ValueWrapper.Infinity)
+        assert(infRange.upperBound.interval == Interval.Open)
+        val negInfRange = range + -Flt64.infinity
+        assert(negInfRange.lowerBound.value is ValueWrapper.NegativeInfinity)
+        assert(negInfRange.lowerBound.interval == Interval.Open)
+        assert(negInfRange.upperBound.value is ValueWrapper.NegativeInfinity)
+        assert(negInfRange.upperBound.interval == Interval.Open)
+        val infRange2 = ValueRange(Flt64.one, Flt64.infinity).value!! + Flt64.one
+        assert(infRange2.lowerBound.value.unwrap() eq Flt64.two)
+        assert(infRange2.lowerBound.interval == Interval.Closed)
+        assert(infRange2.upperBound.value is ValueWrapper.Infinity)
+        assert(infRange2.upperBound.interval == Interval.Open)
+        val negInfRange2 = ValueRange(-Flt64.infinity, Flt64.one).value!! + Flt64.one
+        assert(negInfRange2.lowerBound.value is ValueWrapper.NegativeInfinity)
+        assert(negInfRange2.lowerBound.interval == Interval.Open)
+        assert(negInfRange2.upperBound.value.unwrap() eq Flt64.two)
+        assert(negInfRange2.upperBound.interval == Interval.Closed)
     }
 
     @Test
@@ -39,6 +60,8 @@ class ValueRangeTest {
     @Test
     fun testMultiply() {
         val range = ValueRange(Flt64.one, Flt64.two).value!!
+        val zeroRange = range * Flt64.zero
+        assert(zeroRange!!.fixedValue eq Flt64.zero)
         val twiceRange = range * Flt64.two
         assert(twiceRange!!.lowerBound.value.unwrap() eq Flt64.two)
         assert(twiceRange.upperBound.value.unwrap() eq Flt64(4.0))
@@ -78,6 +101,16 @@ class ValueRangeTest {
         assert(rightHalfRange2 != null && rightHalfRange2.upperBound.value.unwrap() eq Flt64.three)
         val noneRange = range intersect ValueRange(Flt64(4.0), Flt64.ten).value!!
         assert(noneRange == null)
+        val infRange = range intersect ValueRange(Flt64.one, Flt64.infinity).value!!
+        assert(infRange != null && infRange.lowerBound.value.unwrap() eq Flt64.one)
+        assert(infRange != null && infRange.lowerBound.interval == Interval.Closed)
+        assert(infRange != null && infRange.upperBound.value.unwrap() eq Flt64.three)
+        assert(infRange != null && infRange.upperBound.interval == Interval.Closed)
+        val negInfRange = range intersect ValueRange(-Flt64.infinity, Flt64.two).value!!
+        assert(negInfRange != null && negInfRange.lowerBound.value.unwrap() eq Flt64.one)
+        assert(negInfRange != null && negInfRange.lowerBound.interval == Interval.Closed)
+        assert(negInfRange != null && negInfRange.upperBound.value.unwrap() eq Flt64.two)
+        assert(negInfRange != null && negInfRange.upperBound.interval == Interval.Closed)
     }
 
     @Test
@@ -94,5 +127,15 @@ class ValueRangeTest {
         assert(unionRange3 != null && unionRange3.upperBound.value.unwrap() eq Flt64.ten)
         val noneRange = range union ValueRange(Flt64(4.0), Flt64.ten).value!!
         assert(noneRange == null)
+        val infRange = range union ValueRange(Flt64.one, Flt64.infinity).value!!
+        assert(infRange != null && infRange.lowerBound.value.unwrap() eq Flt64.one)
+        assert(infRange != null && infRange.lowerBound.interval == Interval.Closed)
+        assert(infRange != null && infRange.upperBound.value is ValueWrapper.Infinity)
+        assert(infRange != null && infRange.upperBound.interval == Interval.Open)
+        val negInfRange = range union ValueRange(-Flt64.infinity, Flt64.one).value!!
+        assert(negInfRange != null && negInfRange.lowerBound.value is ValueWrapper.NegativeInfinity)
+        assert(negInfRange != null && negInfRange.lowerBound.interval == Interval.Open)
+        assert(negInfRange != null && negInfRange.upperBound.value.unwrap() eq Flt64.three)
+        assert(negInfRange != null && negInfRange.upperBound.interval == Interval.Closed)
     }
 }

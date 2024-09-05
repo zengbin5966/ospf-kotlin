@@ -65,6 +65,14 @@ data class TimeRange(
         return start <= ano.end && ano.start < end
     }
 
+    infix fun intersect(ano: TimeRange): TimeRange? {
+        return intersectionWith(ano)
+    }
+
+    operator fun times(ano: TimeRange): TimeRange? {
+        return intersectionWith(ano)
+    }
+
     fun intersectionWith(ano: TimeRange): TimeRange? {
         val maxBegin = max(start, ano.start)
         val minEnd = min(end, ano.end)
@@ -73,6 +81,14 @@ data class TimeRange(
         } else {
             null
         }
+    }
+
+    infix fun subtract(ano: TimeRange): List<TimeRange> {
+        return differenceWith(ano)
+    }
+
+    operator fun minus(ano: TimeRange): List<TimeRange> {
+        return differenceWith(ano)
     }
 
     fun differenceWith(ano: TimeRange): List<TimeRange> {

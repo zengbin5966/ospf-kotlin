@@ -123,7 +123,7 @@ sealed class ValueWrapper<T>(
 
     val isInfinity get() = this is Infinity
     val isNegativeInfinity get() = this is NegativeInfinity
-    val isInfinityOrNegativeInfinity by lazy { isInfinity && isNegativeInfinity }
+    val isInfinityOrNegativeInfinity by lazy { isInfinity || isNegativeInfinity }
 
     abstract operator fun plus(rhs: T): ValueWrapper<T>
     abstract operator fun minus(rhs: T): ValueWrapper<T>
@@ -195,21 +195,21 @@ sealed class ValueWrapper<T>(
             is NegativeInfinity -> orderOf(1)
         }
 
-        override fun plus(rhs: T): ValueWrapper<T> = Value(value + rhs, constants)
+        override fun plus(rhs: T): ValueWrapper<T> = ValueWrapper(value + rhs, constants).value!!
         override fun plus(rhs: ValueWrapper<T>): ValueWrapper<T> = when (rhs) {
             is Value -> Value(value + rhs.value, constants)
             is Infinity -> Infinity(constants)
             is NegativeInfinity -> NegativeInfinity(constants)
         }
 
-        override fun minus(rhs: T): ValueWrapper<T> = Value(value - rhs, constants)
+        override fun minus(rhs: T): ValueWrapper<T> = ValueWrapper(value - rhs, constants).value!!
         override fun minus(rhs: ValueWrapper<T>): ValueWrapper<T> = when (rhs) {
             is Value -> Value(value - rhs.value, constants)
             is Infinity -> NegativeInfinity(constants)
             is NegativeInfinity -> Infinity(constants)
         }
 
-        override fun times(rhs: T): ValueWrapper<T> = Value(value * rhs, constants)
+        override fun times(rhs: T): ValueWrapper<T> = ValueWrapper(value * rhs, constants).value!!
         override fun times(rhs: ValueWrapper<T>): ValueWrapper<T> = when (rhs) {
             is Value -> Value(value * rhs.value, constants)
             is Infinity -> if (value < constants.zero) {
@@ -229,7 +229,7 @@ sealed class ValueWrapper<T>(
             }
         }
 
-        override fun div(rhs: T): ValueWrapper<T> = Value(value / rhs, constants)
+        override fun div(rhs: T): ValueWrapper<T> = ValueWrapper(value / rhs, constants).value!!
         override fun div(rhs: ValueWrapper<T>): ValueWrapper<T> = when (rhs) {
             is Value -> Value(value / rhs.value, constants)
             is Infinity -> if (value < constants.zero) {

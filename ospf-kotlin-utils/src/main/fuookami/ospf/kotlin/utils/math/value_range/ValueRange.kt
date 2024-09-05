@@ -328,12 +328,24 @@ data class ValueRange<T>(
             is Order.Less -> rhs.lowerBound.value
             else -> lowerBound.value
         }
-        val newLbInterval = lowerBound.interval intersect rhs.lowerBound.interval
+        val newLbInterval = if (lowerBound.value.isInfinityOrNegativeInfinity) {
+            rhs.lowerBound.interval
+        } else if (rhs.lowerBound.value.isInfinityOrNegativeInfinity) {
+            lowerBound.interval
+        } else {
+            lowerBound.interval intersect rhs.lowerBound.interval
+        }
         val newUb = when (upperBound.value ord rhs.upperBound.value) {
             is Order.Less -> upperBound.value
             else -> rhs.upperBound.value
         }
-        val newUbInterval = upperBound.interval intersect rhs.upperBound.interval
+        val newUbInterval = if (upperBound.value.isInfinityOrNegativeInfinity) {
+            rhs.upperBound.interval
+        } else if (rhs.upperBound.value.isInfinityOrNegativeInfinity) {
+            upperBound.interval
+        } else {
+            upperBound.interval intersect rhs.upperBound.interval
+        }
         return when (val result = ValueRange(newLb, newUb, newLbInterval, newUbInterval, constants)) {
             is Ok -> {
                 result.value

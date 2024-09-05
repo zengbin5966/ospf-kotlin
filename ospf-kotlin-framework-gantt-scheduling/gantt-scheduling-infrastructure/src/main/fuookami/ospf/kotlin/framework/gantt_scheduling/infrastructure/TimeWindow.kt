@@ -169,18 +169,11 @@ data class TimeWindow(
 
     val roundTimeSlots: List<TimeRange> by lazy {
         val timeSlots = ArrayList<TimeRange>()
-        var current = this.start.toJavaInstant().truncatedTo(durationUnit.toTimeUnit().toChronoUnit()).toKotlinInstant()
-        val end = this.end.toJavaInstant().truncatedTo(durationUnit.toTimeUnit().toChronoUnit()).toKotlinInstant().let {
-            if (it != this.end) {
-                it + 1.toDuration(durationUnit)
-            } else {
-                it
-            }
-        }
+        var current = start.toJavaInstant().truncatedTo(upper.durationUnit.toTimeUnit().toChronoUnit()).toKotlinInstant()
         while (current != end) {
-            val duration = min(end - current, interval)
+            val duration = min(end - current, upper.interval)
             timeSlots.add(TimeRange(
-                start = current,
+                start = max(start, current),
                 end = current + duration
             ))
             current += duration

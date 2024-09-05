@@ -29,6 +29,22 @@ open class WorkingCalendar(
     open val unavailableTimes = unavailableTimes.sortedBy { it.start }
 
     fun actualTime(
+        time: Instant,
+        connectionTime: Duration = Duration.ZERO
+    ): Instant {
+        var currentTime = time
+        for (unavailableTime in unavailableTimes) {
+            if (currentTime < unavailableTime.start) {
+                break
+            }
+            if (unavailableTime.contains(currentTime)) {
+                currentTime = unavailableTime.end + connectionTime
+            }
+        }
+        return currentTime
+    }
+
+    fun actualTime(
         time: TimeRange,
         connectionTime: Duration = Duration.ZERO
     ): TimeRange {
@@ -44,6 +60,37 @@ open class WorkingCalendar(
                     end = max(currentTime.end, unavailableTime.end) + intersection.duration + connectionTime
                 )
             }
+        }
+        return currentTime
+    }
+
+    fun validTime(
+        time: TimeRange,
+        connectionTime: Duration = Duration.ZERO
+    ): Duration {
+        var currentTime = time.duration
+        for (unavailableTime in unavailableTimes) {
+            val intersectionTime = time.intersectionWith(unavailableTime)?.duration ?: Duration.ZERO
+            if (intersectionTime != Duration.ZERO) {
+                currentTime -= min(
+                    currentTime,
+                    intersectionTime + connectionTime
+                )
+            }
+        }
+        return currentTime
+    }
+
+    fun validTimes(
+        time: TimeRange,
+        connectionTime: Duration = Duration.ZERO,
+    ): List<TimeRange> {
+        var currentTime = mutableListOf(time)
+        for (unavailableTime in unavailableTimes) {
+            currentTime = currentTime.flatMap { thisRestTime ->
+                val diff = thisRestTime - unavailableTime
+                diff.filter { thisRestTime.duration > connectionTime }
+            }.toMutableList()
         }
         return currentTime
     }
